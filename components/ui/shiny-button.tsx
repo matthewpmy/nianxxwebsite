@@ -7,22 +7,46 @@ interface ShinyButtonProps {
   children: React.ReactNode
   onClick?: () => void
   className?: string
+  size?: 'default' | 'small'
 }
 
-export function ShinyButton({ children, onClick, className = "" }: ShinyButtonProps) {
+export function ShinyButton({ children, onClick, className = "", size = "default" }: ShinyButtonProps) {
   useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
+      @import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,500&display=swap");
+
+      @property --gradient-angle {
+        syntax: "<angle>";
+        initial-value: 0deg;
+        inherits: false;
+      }
+
+      @property --gradient-angle-offset {
+        syntax: "<angle>";
+        initial-value: 0deg;
+        inherits: false;
+      }
+
+      @property --gradient-percent {
+        syntax: "<percentage>";
+        initial-value: 5%;
+        inherits: false;
+      }
+
+      @property --gradient-shine {
+        syntax: "<color>";
+        initial-value: white;
+        inherits: false;
+      }
+
       .shiny-cta {
         --shiny-cta-bg: #2563eb;
         --shiny-cta-bg-subtle: #1d4ed8;
         --shiny-cta-fg: #ffffff;
         --shiny-cta-highlight: #60a5fa;
         --shiny-cta-highlight-subtle: #93c5fd;
-        --gradient-angle: 0deg;
-        --gradient-angle-offset: 0deg;
-        --gradient-percent: 5%;
-        --gradient-shine: white;
+        --animation: gradient-angle linear infinite;
         --duration: 3s;
         --shadow-size: 2px;
         --transition: 800ms cubic-bezier(0.25, 1, 0.5, 1);
@@ -34,7 +58,7 @@ export function ShinyButton({ children, onClick, className = "" }: ShinyButtonPr
         outline-offset: 4px;
         padding: 1.25rem 2.5rem;
         font-family: "Inter", sans-serif;
-        font-size: 1rem;
+        font-size: 1.125rem;
         line-height: 1.2;
         font-weight: 500;
         border: 1px solid transparent;
@@ -45,7 +69,7 @@ export function ShinyButton({ children, onClick, className = "" }: ShinyButtonPr
             from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
             transparent,
             var(--shiny-cta-highlight) var(--gradient-percent),
-            var(--shiny-cta-fg) calc(var(--gradient-percent) * 2),
+            var(--gradient-shine) calc(var(--gradient-percent) * 2),
             var(--shiny-cta-highlight) calc(var(--gradient-percent) * 3),
             transparent calc(var(--gradient-percent) * 4)
           ) border-box;
@@ -68,6 +92,11 @@ export function ShinyButton({ children, onClick, className = "" }: ShinyButtonPr
 
       .shiny-cta:active {
         translate: 0 1px;
+      }
+
+      .shiny-cta-sm {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
       }
 
       .shiny-cta::before {
@@ -95,6 +124,7 @@ export function ShinyButton({ children, onClick, className = "" }: ShinyButtonPr
       }
 
       .shiny-cta::after {
+        --animation: shimmer linear infinite;
         width: 100%;
         aspect-ratio: 1;
         background: linear-gradient(
@@ -118,17 +148,51 @@ export function ShinyButton({ children, onClick, className = "" }: ShinyButtonPr
         box-shadow: inset 0 -1ex 2rem 4px var(--shiny-cta-highlight);
         opacity: 0;
         transition: opacity var(--transition);
+        animation: calc(var(--duration) * 1.5) breathe linear infinite;
       }
 
       .shiny-cta,
       .shiny-cta::before,
       .shiny-cta::after {
-        animation: gradient-angle var(--duration) linear infinite paused;
+        animation: var(--animation) var(--duration),
+          var(--animation) calc(var(--duration) / 0.4) reverse paused;
+        animation-composition: add;
+      }
+
+      .shiny-cta:is(:hover, :focus-visible) {
+        --gradient-percent: 20%;
+        --gradient-angle-offset: 95deg;
+        --gradient-shine: var(--shiny-cta-highlight-subtle);
+      }
+
+      .shiny-cta:is(:hover, :focus-visible),
+      .shiny-cta:is(:hover, :focus-visible)::before,
+      .shiny-cta:is(:hover, :focus-visible)::after {
+        animation-play-state: running;
+      }
+
+      .shiny-cta:is(:hover, :focus-visible) span::before {
+        opacity: 1;
       }
 
       @keyframes gradient-angle {
         to {
           --gradient-angle: 360deg;
+        }
+      }
+
+      @keyframes shimmer {
+        to {
+          rotate: 360deg;
+        }
+      }
+
+      @keyframes breathe {
+        from, to {
+          scale: 1;
+        }
+        50% {
+          scale: 1.2;
         }
       }
     `
@@ -139,7 +203,10 @@ export function ShinyButton({ children, onClick, className = "" }: ShinyButtonPr
   }, [])
 
   return (
-    <button className={`shiny-cta ${className}`} onClick={onClick}>
+    <button
+      className={`shiny-cta ${size === 'small' ? 'shiny-cta-sm' : ''} ${className}`}
+      onClick={onClick}
+    >
       <span>{children}</span>
     </button>
   )

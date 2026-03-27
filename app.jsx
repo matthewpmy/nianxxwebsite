@@ -725,7 +725,7 @@ export default function App() {
           </div>
 
           <div className="px-2">
-            <ShinyButton>联系我们</ShinyButton>
+            <ShinyButton size="small">联系我们</ShinyButton>
           </div>
         </nav>
       </div>

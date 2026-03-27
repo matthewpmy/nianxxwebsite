@@ -346,10 +346,10 @@ const HeroRobotAvatar = () => {
       const rect = containerRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-      const maxOffset = 25;
+      const maxOffset = 50;
       
-      const deltaX = (e.clientX - centerX) * 0.04;
-      const deltaY = (e.clientY - centerY) * 0.04;
+      const deltaX = (e.clientX - centerX) * 0.1;
+      const deltaY = (e.clientY - centerY) * 0.1;
       
       setMousePosition({
         x: Math.max(-maxOffset, Math.min(maxOffset, deltaX)),
@@ -374,7 +374,7 @@ const HeroRobotAvatar = () => {
       <motion.div 
         className="relative z-10 flex items-center justify-center w-[440px] h-[330px]" 
         animate={{ x: mousePos.x, y: mousePos.y - 15 }} 
-        transition={{ type: "spring", stiffness: 120, damping: 15 }}
+        transition={{ type: "spring", stiffness: 250, damping: 20 }}
       >
         <Esp32Face frame={frame} />
       </motion.div>
@@ -419,19 +419,19 @@ export function FeatureCarousel({ features, theme = "light" }) {
   };
 
   const isDark = theme === "dark";
-  const bgColors = isDark 
-    ? { container: "bg-slate-900", overlay: "from-slate-900 via-slate-900/90" } 
-    : { container: "bg-slate-50", overlay: "from-slate-50 via-slate-50/90" };
+  const bgColors = isDark
+    ? { container: "bg-[#0f172a]", overlay: "from-[#0f172a]", gradient: "bg-gradient-to-b from-[#0f172a] via-[#0f172a]/80 to-transparent" }
+    : { container: "bg-slate-50", overlay: "from-slate-50", gradient: "bg-gradient-to-b from-slate-50 via-slate-50/90 to-transparent" };
 
   return (
-    <div className="w-full">
-      <div className="relative overflow-hidden rounded-[2.5rem] flex flex-col lg:flex-row min-h-[600px] lg:h-[550px] border border-slate-200 shadow-sm bg-white">
-        
-        <div className={cn("w-full lg:w-[45%] min-h-[350px] lg:h-full relative z-30 flex flex-col items-start justify-center overflow-hidden px-6 md:px-12 lg:pl-12", bgColors.container)}>
-          <div className={cn("absolute inset-x-0 top-0 h-16 bg-gradient-to-b to-transparent z-40", bgColors.overlay)} />
-          <div className={cn("absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t to-transparent z-40", bgColors.overlay)} />
-          
-          <div className="relative w-full h-full flex items-center justify-start z-20 pt-8 lg:pt-0">
+    <div className="w-full max-w-7xl mx-auto md:p-8">
+      <div className="relative overflow-hidden rounded-[2.5rem] lg:rounded-[4rem] flex flex-col lg:flex-row min-h-[600px] lg:aspect-video border border-slate-200/50 shadow-xl bg-white">
+
+        <div className={cn("w-full lg:w-[40%] min-h-[350px] md:min-h-[450px] lg:h-full relative z-30 flex flex-col items-start justify-center overflow-hidden px-8 md:px-16 lg:pl-16", bgColors.container)}>
+          <div className={cn("absolute inset-x-0 top-0 h-12 md:h-20 lg:h-16 bg-gradient-to-b z-40", bgColors.gradient)} />
+          <div className={cn("absolute inset-x-0 bottom-0 h-12 md:h-20 lg:h-16 bg-gradient-to-t z-40", bgColors.gradient)} />
+
+          <div className="relative w-full h-full flex items-center justify-center lg:justify-start z-20">
             {features.map((feature, index) => {
               const isActive = index === currentIndex;
               const distance = index - currentIndex;
@@ -440,37 +440,37 @@ export function FeatureCarousel({ features, theme = "light" }) {
               return (
                 <motion.div
                   key={feature.id}
-                  style={{ height: ITEM_HEIGHT, width: "100%" }}
+                  style={{ height: ITEM_HEIGHT, width: "fit-content" }}
                   animate={{
                     y: wrappedDistance * ITEM_HEIGHT,
-                    opacity: 1 - Math.abs(wrappedDistance) * 0.35,
-                    scale: isActive ? 1 : 0.95
+                    opacity: 1 - Math.abs(wrappedDistance) * 0.25,
                   }}
                   transition={{ type: "spring", stiffness: 90, damping: 22, mass: 1 }}
-                  className="absolute flex items-center justify-start w-full"
+                  className="absolute flex items-center justify-start"
                 >
                   <button
                     onClick={() => handleChipClick(index)}
                     onMouseEnter={() => setIsPaused(true)}
                     onMouseLeave={() => setIsPaused(false)}
                     className={cn(
-                      "relative flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-500 text-left w-full border",
+                      "relative flex items-center gap-4 px-6 md:px-10 lg:px-8 py-3.5 md:py-5 lg:py-4 rounded-full transition-all duration-700 text-left group border",
                       isActive
-                        ? isDark ? "bg-white/10 border-white/20 shadow-md backdrop-blur-md" : "bg-white border-slate-200 shadow-md"
-                        : "bg-transparent border-transparent hover:bg-slate-200/50"
+                        ? isDark ? "bg-white/10 text-cyan-400 border-white/20 z-10" : "bg-white text-blue-600 border-slate-200 z-10"
+                        : isDark ? "text-white/60 border-white/20 hover:border-white/40 hover:text-white" : "text-slate-500 border-transparent hover:border-white/40 hover:text-slate-700"
                     )}
                   >
-                    <div className={cn("flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-500 shadow-sm", isActive ? (isDark ? "bg-cyan-500/20 text-cyan-400" : "bg-blue-50 text-blue-600") : "bg-slate-200/50 text-slate-400")}>
-                      <feature.icon size={20} strokeWidth={2} />
+                    <div
+                      className={cn(
+                        "flex items-center justify-center transition-colors duration-500",
+                        isActive ? (isDark ? "text-cyan-400" : "text-blue-600") : "text-slate-400"
+                      )}
+                    >
+                      <feature.icon size={18} strokeWidth={2} />
                     </div>
-                    <div>
-                      <span className={cn("block font-bold text-[15px] tracking-tight mb-0.5", isActive ? (isDark ? "text-white" : "text-slate-900") : "text-slate-500")}>
-                        {feature.label}
-                      </span>
-                      <span className={cn("block font-light text-[12px] truncate max-w-[200px] transition-opacity duration-300", isActive ? (isDark ? "text-slate-300" : "text-slate-500") : "opacity-0 hidden")}>
-                        {feature.description}
-                      </span>
-                    </div>
+
+                    <span className="font-medium text-sm md:text-[15px] tracking-tight whitespace-nowrap uppercase">
+                      {feature.label}
+                    </span>
                   </button>
                 </motion.div>
               );
@@ -478,8 +478,8 @@ export function FeatureCarousel({ features, theme = "light" }) {
           </div>
         </div>
 
-        <div className="flex-1 min-h-[400px] lg:h-full relative bg-slate-100 flex items-center justify-center py-12 px-6 overflow-hidden border-t lg:border-t-0 lg:border-l border-slate-200">
-          <div className="relative w-full max-w-[380px] aspect-[4/5] flex items-center justify-center">
+        <div className={cn("flex-1 min-h-[500px] md:min-h-[600px] lg:h-full relative flex items-center justify-center py-16 md:py-24 lg:py-16 px-6 md:px-12 lg:px-10 overflow-hidden border-t lg:border-t-0 lg:border-l", isDark ? "bg-slate-900/50 border-slate-800" : "bg-secondary/30 border-slate-200/20")}>
+          <div className="relative w-full max-w-[420px] aspect-[4/5] flex items-center justify-center">
             {features.map((feature, index) => {
               const status = getCardStatus(index);
               const isActive = status === "active";
@@ -493,13 +493,13 @@ export function FeatureCarousel({ features, theme = "light" }) {
                   animate={{
                     x: isActive ? 0 : isPrev ? -100 : isNext ? 100 : 0,
                     scale: isActive ? 1 : isPrev || isNext ? 0.85 : 0.7,
-                    opacity: isActive ? 1 : isPrev || isNext ? 0.5 : 0,
-                    rotate: isPrev ? -4 : isNext ? 4 : 0,
+                    opacity: isActive ? 1 : isPrev || isNext ? 0.4 : 0,
+                    rotate: isPrev ? -3 : isNext ? 3 : 0,
                     zIndex: isActive ? 20 : isPrev || isNext ? 10 : 0,
                     pointerEvents: isActive ? "auto" : "none",
                   }}
                   transition={{ type: "spring", stiffness: 260, damping: 25, mass: 0.8 }}
-                  className="absolute inset-0 rounded-[2rem] overflow-hidden border-[6px] border-white shadow-2xl bg-white origin-center"
+                  className={cn("absolute inset-0 rounded-[2rem] md:rounded-[2.8rem] overflow-hidden border-4 md:border-8 origin-center", isDark ? "border-slate-800 bg-slate-900" : "border-background bg-background")}
                 >
                   <img
                     src={feature.image}
@@ -516,22 +516,22 @@ export function FeatureCarousel({ features, theme = "light" }) {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute inset-x-0 bottom-0 p-8 pt-24 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end pointer-events-none"
+                        className="absolute inset-x-0 bottom-0 p-10 pt-32 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end pointer-events-none"
                       >
-                        <div className="bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest w-fit shadow-lg mb-2 border border-white/30">
-                          {index + 1} / {features.length}
+                        <div className={cn("px-4 py-1.5 rounded-full text-[11px] font-medium uppercase tracking-[0.2em] w-fit shadow-lg mb-3 border", isDark ? "bg-white/10 text-white border-white/20 backdrop-blur-md" : "bg-background text-foreground border-border/50")}>
+                          {index + 1} • {feature.label}
                         </div>
-                        <p className="text-white font-medium text-lg leading-snug drop-shadow-md">
+                        <p className="text-white font-normal text-xl md:text-2xl leading-tight drop-shadow-md tracking-tight">
                           {feature.description}
                         </p>
                       </motion.div>
                     )}
                   </AnimatePresence>
 
-                  <div className={cn("absolute top-6 left-6 flex items-center gap-2 transition-opacity duration-300 bg-black/40 backdrop-blur px-3 py-1.5 rounded-full", isActive ? "opacity-100" : "opacity-0")}>
-                    <div className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80] animate-pulse" />
-                    <span className="text-white text-[10px] font-bold uppercase tracking-widest">
-                      Live
+                  <div className={cn("absolute top-8 left-8 flex items-center gap-3 transition-opacity duration-300", isActive ? "opacity-100" : "opacity-0")}>
+                    <div className="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_white]" />
+                    <span className="text-white/80 text-[10px] font-medium uppercase tracking-[0.3em] font-mono">
+                      Live Session
                     </span>
                   </div>
                 </motion.div>
@@ -951,7 +951,7 @@ export default function App() {
       {/* 极简底部 */}
       <footer id="联系我们" className="py-12 text-center relative z-10 flex flex-col items-center">
          <div className="flex items-center gap-2 mb-4">
-           <img src="/logo.png" alt="NIANXX" className="h-8" />
+           <img src="/logo1.png" alt="NIANXX" className="h-8" />
          </div>
          <p className="text-sm text-slate-500 font-medium mb-8">陌生之处，不再孤身一人</p>
          <div className="flex flex-col md:flex-row items-center gap-6 text-sm text-slate-500 font-medium bg-white px-6 py-3 rounded-full border border-slate-200 shadow-sm">

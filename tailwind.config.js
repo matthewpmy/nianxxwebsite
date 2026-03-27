@@ -8,6 +8,10 @@ export default {
   theme: {
     extend: {
       colors: {
+        primary: {
+          DEFAULT: 'hsl(221.2 83.2% 53.3%)',
+          foreground: 'hsl(210 40% 98%)',
+        },
         brand: {
           50: '#faffe5',
           100: '#f3ffc6',

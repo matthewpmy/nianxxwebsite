@@ -1,16 +1,15 @@
-import { Button } from "@/components/ui/button"
 import { ArrowUpRight } from "lucide-react"
 
 const ButtonWithIcon = () => {
   return (
-    <Button className="relative text-sm font-medium rounded-full h-12 p-1 ps-6 pe-14 group transition-all duration-500 hover:ps-14 hover:pe-6 w-fit overflow-hidden cursor-pointer bg-white text-black hover:bg-white border border-gray-200">
-      <span className="relative z-10 transition-all duration-500">
-        取消预约交流
+    <button className="group flex cursor-pointer items-center gap-0 rounded-full border-none bg-transparent px-0 py-5 shadow-none hover:bg-transparent">
+      <span className="rounded-full bg-blue-500 px-6 py-3 text-white duration-500 ease-in-out group-hover:bg-blue-600 group-hover:transition-colors">
+        联系我们
       </span>
-      <div className="absolute right-1 w-10 h-10 bg-black text-white rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-[calc(100%-44px)] group-hover:rotate-45">
-        <ArrowUpRight size={16} />
+      <div className="relative flex h-fit cursor-pointer items-center overflow-hidden rounded-full bg-blue-500 p-5 text-white">
+        <ArrowUpRight className="h-5 w-5" />
       </div>
-    </Button>
+    </button>
   )
 }
 

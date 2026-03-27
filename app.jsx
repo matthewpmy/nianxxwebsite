@@ -7,6 +7,8 @@ import {
   Utensils, Calendar, Navigation, Store, Clock, Ticket, Baby, Camera, HelpCircle, Coffee
 } from 'lucide-react';
 import ButtonWithIcon from './components/ui/button-witn-icon';
+import ArrowButton from './components/ui/arrow-button';
+import { ShinyButton } from './components/ui/shiny-button';
 
 // --- 1. 工具函数 ---
 const cn = (...classes) => classes.filter(Boolean).join(' ');
@@ -711,8 +713,7 @@ export default function App() {
       <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-6 pointer-events-none">
         <nav className={`pointer-events-auto transition-all duration-500 ease-out flex items-center justify-between px-2 py-2 rounded-full ${isScrolled ? 'bg-white/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/80 w-full max-w-4xl' : 'bg-transparent border border-transparent w-full max-w-7xl px-0'}`}>
           <div className="flex items-center gap-2 px-4 cursor-pointer">
-            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center shadow-inner"><Bot size={18} className="text-white" /></div>
-            <span className="font-bold tracking-tight text-slate-900">NIANXX<span className="text-slate-400 font-normal ml-1.5 text-xs">智念科技</span></span>
+            <img src="/logo.png" alt="NIANXX" className="h-7" />
           </div>
           
           <div className={`hidden md:flex items-center gap-2 ${isScrolled ? '' : 'bg-white/50 backdrop-blur-md rounded-full px-4 border border-white/60 shadow-sm'}`}>
@@ -724,7 +725,7 @@ export default function App() {
           </div>
 
           <div className="px-2">
-            <ButtonWithIcon />
+            <ShinyButton>联系我们</ShinyButton>
           </div>
         </nav>
       </div>
@@ -929,8 +930,7 @@ export default function App() {
                <p className="text-slate-400 font-light mb-12 max-w-md">无论是单个景区酒店，还是全域文旅规划，我们都能提供在不改变现有业务基础上的开箱即用方案。</p>
                
                <div className="flex flex-col sm:flex-row gap-4">
-                 <InteractiveArrowButton primary size="lg">获取合作方案</InteractiveArrowButton>
-                 <button className="flex h-12 items-center justify-center bg-white/10 text-white border border-white/20 px-8 rounded-full font-bold hover:bg-white/20 transition-colors text-center">预约交流</button>
+                 <ShinyButton>获取合作方案</ShinyButton>
                </div>
              </div>
 
@@ -951,8 +951,7 @@ export default function App() {
       {/* 极简底部 */}
       <footer id="联系我们" className="py-12 text-center relative z-10 flex flex-col items-center">
          <div className="flex items-center gap-2 mb-4">
-           <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center shadow-inner"><Bot size={16} className="text-white" /></div>
-           <span className="font-bold tracking-tight text-slate-900 text-lg">NIANXX 智念科技</span>
+           <img src="/logo.png" alt="NIANXX" className="h-8" />
          </div>
          <p className="text-sm text-slate-500 font-medium mb-8">陌生之处，不再孤身一人</p>
          <div className="flex flex-col md:flex-row items-center gap-6 text-sm text-slate-500 font-medium bg-white px-6 py-3 rounded-full border border-slate-200 shadow-sm">

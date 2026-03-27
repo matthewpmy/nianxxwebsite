@@ -6,6 +6,7 @@ import {
   Smartphone, LayoutDashboard, Globe, Layers, Zap, ShieldCheck,
   Utensils, Calendar, Navigation, Store, Clock, Ticket, Baby, Camera, HelpCircle, Coffee
 } from 'lucide-react';
+import ButtonWithIcon from './components/ui/button-witn-icon';
 
 // --- 1. 工具函数 ---
 const cn = (...classes) => classes.filter(Boolean).join(' ');
@@ -723,9 +724,7 @@ export default function App() {
           </div>
 
           <div className="px-2">
-            <InteractiveArrowButton primary size="default">
-              联系我们
-            </InteractiveArrowButton>
+            <ButtonWithIcon />
           </div>
         </nav>
       </div>

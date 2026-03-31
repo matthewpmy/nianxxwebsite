@@ -18,6 +18,18 @@ const wrap = (min, max, v) => {
   return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min;
 };
 
+const TOURIST_TABS = [
+  { value: "tab-1", label: "基于目的地的服务能力", icon: Map },
+  { value: "tab-2", label: "每位游客独一无二的伴游记忆", icon: Layers },
+  { value: "tab-3", label: "趣味性随身机器人", icon: Bot },
+];
+
+const INTERNAL_TABS = [
+  { value: "tab-a", label: "操作类功能", icon: Settings },
+  { value: "tab-b", label: "流程类功能", icon: LineChart },
+  { value: "tab-c", label: "设计类功能", icon: Sparkles },
+];
+
 const useScrollReveal = (delay = 0) => {
   const [isVisible, setIsVisible] = useState(false);
   const domRef = useRef();
@@ -164,7 +176,157 @@ const INTERNAL_FEATURES = [
   { id: "settings", label: "定制类：降本增效", icon: Settings, image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200", description: "游客合照智能优化，自动化满意度问卷，精准规划专属电子地图。" },
 ];
 
-// --- 4. 核心 UI 组件 ---
+// --- Feature Carousel Component ---
+function FeatureCarouselSection({ features, theme = "light" }) {
+  const [step, setStep] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const isDark = theme === "dark";
+  const bgColor = isDark ? "bg-slate-900" : "bg-blue-500";
+  const chipActiveBg = isDark ? "bg-white text-slate-900" : "bg-white text-blue-500";
+  const chipInactiveBg = isDark ? "bg-transparent text-white/60 border-white/20 hover:border-white/40 hover:text-white" : "bg-transparent text-white/60 border-white/20 hover:border-white/40 hover:text-white";
+  const iconActiveColor = isDark ? "text-slate-900" : "text-blue-500";
+  const iconInactiveColor = isDark ? "text-white/40" : "text-white/40";
+  const headerBg = isDark ? "bg-white/10 border-white/20 text-white/80" : "bg-white border border-slate-200 text-slate-600";
+
+  const currentIndex = ((step % features.length) + features.length) % features.length;
+
+  const nextStep = useCallback(() => {
+    setStep((prev) => prev + 1);
+  }, []);
+
+  const handleChipClick = (index) => {
+    const diff = (index - currentIndex + features.length) % features.length;
+    if (diff > 0) setStep((s) => s + diff);
+  };
+
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(nextStep, 4000);
+    return () => clearInterval(interval);
+  }, [nextStep, isPaused]);
+
+  const getCardStatus = (index) => {
+    const diff = index - currentIndex;
+    const len = features.length;
+    let normalizedDiff = diff;
+    if (diff > len / 2) normalizedDiff -= len;
+    if (diff < -len / 2) normalizedDiff += len;
+    if (normalizedDiff === 0) return "active";
+    if (normalizedDiff === -1) return "prev";
+    if (normalizedDiff === 1) return "next";
+    return "hidden";
+  };
+
+  return (
+    <div className={cn("w-full flex flex-col lg:flex-row min-h-[600px] lg:aspect-video")}>
+      <div className={cn("w-full lg:w-[45%] min-h-[350px] md:min-h-[450px] lg:h-full relative z-30 flex flex-col items-start justify-center overflow-hidden px-8 md:px-16 lg:pl-16 py-12", bgColor)}>
+        <div className="relative w-full h-full flex items-center justify-center lg:justify-start z-20">
+          {features.map((feature, index) => {
+            const isActive = index === currentIndex;
+            const distance = index - currentIndex;
+            const wrappedDistance = wrap(-(features.length / 2), features.length / 2, distance);
+
+            return (
+              <motion.div
+                key={feature.id}
+                style={{ height: ITEM_HEIGHT, width: "fit-content" }}
+                animate={{
+                  y: wrappedDistance * ITEM_HEIGHT,
+                  opacity: 1 - Math.abs(wrappedDistance) * 0.25,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 90,
+                  damping: 22,
+                  mass: 1,
+                }}
+                className="absolute flex items-center justify-start"
+              >
+                <button
+                  onClick={() => handleChipClick(index)}
+                  onMouseEnter={() => setIsPaused(true)}
+                  onMouseLeave={() => setIsPaused(false)}
+                  className={cn(
+                    "relative flex items-center gap-4 px-6 md:px-10 lg:px-8 py-3.5 md:py-5 lg:py-4 rounded-full transition-all duration-700 text-left group border",
+                    isActive ? chipActiveBg : chipInactiveBg
+                  )}
+                >
+                  <div className={cn("flex items-center justify-center transition-colors duration-500", isActive ? iconActiveColor : iconInactiveColor)}>
+                    <feature.icon size={18} strokeWidth={2} />
+                  </div>
+                  <span className="font-medium text-sm md:text-[15px] tracking-tight whitespace-nowrap">
+                    {feature.label}
+                  </span>
+                </button>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className={cn("flex-1 min-h-[500px] md:min-h-[600px] lg:h-full relative flex items-center justify-center py-16 md:py-24 lg:py-16 px-6 md:px-12 lg:px-10 overflow-hidden", isDark ? "bg-slate-800/50" : "bg-slate-50")}>
+        <div className="relative w-full max-w-[420px] aspect-[4/5] flex items-center justify-center">
+          {features.map((feature, index) => {
+            const status = getCardStatus(index);
+            const isActive = status === "active";
+            const isPrev = status === "prev";
+            const isNext = status === "next";
+
+            return (
+              <motion.div
+                key={feature.id}
+                initial={false}
+                animate={{
+                  x: isActive ? 0 : isPrev ? -100 : isNext ? 100 : 0,
+                  scale: isActive ? 1 : isPrev || isNext ? 0.85 : 0.7,
+                  opacity: isActive ? 1 : isPrev || isNext ? 0.4 : 0,
+                  rotate: isPrev ? -3 : isNext ? 3 : 0,
+                  zIndex: isActive ? 20 : isPrev || isNext ? 10 : 0,
+                  pointerEvents: isActive ? "auto" : "none",
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 25,
+                  mass: 0.8,
+                }}
+                className="absolute inset-0 rounded-[2rem] md:rounded-[2.8rem] overflow-hidden border-4 md:border-8 bg-background origin-center"
+              >
+                <img
+                  src={feature.image}
+                  alt={feature.label}
+                  className={cn("w-full h-full object-cover transition-all duration-700", isActive ? "" : "grayscale blur-[2px] brightness-75")}
+                />
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute inset-x-0 bottom-0 p-10 pt-32 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end pointer-events-none"
+                    >
+                      <div className={cn("px-4 py-1.5 rounded-full text-[11px] font-normal uppercase tracking-[0.2em] w-fit shadow-lg mb-3 border border-border/50", headerBg)}>
+                        {index + 1} • {feature.label}
+                      </div>
+                      <p className="text-white font-normal text-xl md:text-2xl leading-tight drop-shadow-md tracking-tight">
+                        {feature.description}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <div className={cn("absolute top-8 left-8 flex items-center gap-3 transition-opacity duration-300", isActive ? "opacity-100" : "opacity-0")}>
+                  <div className="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_white]" />
+                  <span className="text-white/80 text-[10px] font-normal uppercase tracking-[0.3em] font-mono">Live Demo</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const SurfaceCard = ({ children, className = "", delay = 0, hover = true }) => {
   const [ref, isVisible] = useScrollReveal(delay);
@@ -243,9 +405,7 @@ const MagnifiedBento = () => {
   const inverseMask = useMotionTemplate`radial-gradient(circle 32px at calc(50% + ${lensX}px - 10px) calc(50% + ${lensY}px - 10px), transparent 100%, black 100%)`;
 
   return (
-    <div className="w-full flex items-center justify-center">
-      <SurfaceCard hover={false} delay={100} className="relative w-full max-w-[500px] overflow-hidden !rounded-[2.5rem] !p-2 transition-all duration-500">
-        <div ref={containerRef} className="relative w-full overflow-hidden rounded-[2rem] bg-slate-100/50 h-[260px] md:h-[300px] border border-slate-200/60 shadow-inner">
+    <div ref={containerRef} className="relative w-full overflow-hidden h-[260px] md:h-[300px]">
           <div className="relative h-full w-full flex flex-col items-center justify-center">
             
             <motion.div
@@ -312,15 +472,13 @@ const MagnifiedBento = () => {
 
           <div className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-slate-50 to-transparent z-20"></div>
           <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-slate-50 to-transparent z-20"></div>
-        </div>
-      </SurfaceCard>
     </div>
   );
 };
 
 const RobotContainerSVG = () => (
   <img 
-    src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/ccv2%2F2026-03-27%2FMiniMax-M2.7%2F2030679614669464496%2F7661fb08e8617317c79d4706e6a9ab5655a92bde564defab818e89ac02482bf3..png?Expires=1774684327&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=WlSB1VKvyO67ZtfjOoLcT5oBTBI%3D"
+    src="/cell_bg.png"
     alt="Robot Container"
     width="512"
     height="516"
@@ -328,9 +486,51 @@ const RobotContainerSVG = () => (
   />
 );
 
+const IconoirIcons = {
+  Map: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3V7z"/>
+      <path d="M9 4v13M15 7v13"/>
+    </svg>
+  ),
+  ForkSpoon: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
+    </svg>
+  ),
+  Ticket: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+      <path d="M13 5v2M13 17v2M13 11v2"/>
+    </svg>
+  ),
+  BuildingHospital: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
+      <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/>
+      <path d="M10 6h4M10 10h4M10 14h4M10 18h4"/>
+    </svg>
+  ),
+  Bot: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 8V4H8"/>
+      <rect width="16" height="12" x="4" y="8" rx="2"/>
+      <path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>
+    </svg>
+  ),
+  Camera: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+      <circle cx="12" cy="13" r="3"/>
+    </svg>
+  ),
+};
+
 const HeroRobotAvatar = () => {
   const [mousePos, setMousePosition] = useState({ x: 0, y: 0 });
   const [frame, setFrame] = useState(0);
+  const [rotationAngle, setRotationAngle] = useState(0);
+  const [hoveredFeature, setHoveredFeature] = useState(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -338,6 +538,13 @@ const HeroRobotAvatar = () => {
       setFrame(f => (f + 1) % LOOP_F);
     }, 1000 / 30);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRotationAngle(prev => (prev + 0.15) % 360);
+    }, 50);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -360,17 +567,202 @@ const HeroRobotAvatar = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  const orbitalFeatures = [
+    { 
+      Icon: IconoirIcons.Map, 
+      label: "景点推荐", 
+      desc: "精准推荐游玩点",
+      chat: [
+        { role: "user", text: "附近有什么好玩的景点推荐吗？" },
+        { role: "assistant", text: "根据您现在的位置，我推荐「荔波小七孔」景区，距离约15公里，风景秀丽，建议游览3-4小时。现在预约门票可享8折优惠哦～" },
+      ]
+    },
+    { 
+      Icon: IconoirIcons.ForkSpoon, 
+      label: "餐饮预约", 
+      desc: "地道美食发现",
+      chat: [
+        { role: "user", text: "附近有什么好吃的？" },
+        { role: "assistant", text: "推荐您尝尝当地的酸汤鱼！距离最近的「苗家酸汤鱼」餐厅步行仅5分钟，评分4.8星，需要我帮您预约座位吗？" },
+      ]
+    },
+    { 
+      Icon: IconoirIcons.Ticket, 
+      label: "活动报名", 
+      desc: "精彩活动参与",
+      chat: [
+        { role: "user", text: "今晚有什么活动可以参加？" },
+        { role: "assistant", text: "今晚8点有「苗族篝火晚会」，包含民族歌舞表演和互动游戏。门票68元/人，包含特色烧烤。需要我帮您报名吗？" },
+      ]
+    },
+    { 
+      Icon: IconoirIcons.BuildingHospital, 
+      label: "酒店服务", 
+      desc: "贴心入住体验",
+      chat: [
+        { role: "user", text: "可以帮我延迟退房吗？" },
+        { role: "assistant", text: "好的，已为您办理延迟退房至下午2点。如需其他服务，随时呼叫我～" },
+      ]
+    },
+    { 
+      Icon: IconoirIcons.Bot, 
+      label: "AI伴游", 
+      desc: "专属智能助手",
+      chat: [
+        { role: "user", text: "明天天气怎么样？" },
+        { role: "assistant", text: "明天多云转晴，气温18-26℃，适合出行。建议上午游览景区，下午可在酒店休息享受温泉～" },
+      ]
+    },
+    { 
+      Icon: IconoirIcons.Camera, 
+      label: "趣味拍照", 
+      desc: "智能合照留念",
+      chat: [
+        { role: "user", text: "帮我拍张照留念" },
+        { role: "assistant", text: "好的！站在这个位置，看向镜头，3...2...1茄子！📸 照片已保存到您的相册，要不要加个滤镜或者生成AI漫画版？" },
+      ]
+    },
+  ];
+
+  const calculateNodePosition = (index, total, radius, offset = 15) => {
+    const angle = ((index / total) * 360 + rotationAngle) * (Math.PI / 180);
+    const x = radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
+    const nx = Math.cos(angle);
+    const ny = Math.sin(angle);
+    return { x: x + nx * offset, y: y + ny * offset };
+  };
+
   return (
     <motion.div 
       ref={containerRef}
-      className="relative w-full h-full max-w-[500px] max-h-[500px] flex items-center justify-center pointer-events-auto"
-      animate={{ y: [-10, 10, -10] }}
-      transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+      className="relative w-full h-full max-w-[600px] max-h-[600px] flex items-center justify-center pointer-events-auto"
     >
-      <div className="absolute inset-0 flex items-center justify-center z-0">
+      {/* Robot Background */}
+      <div className="absolute inset-0 flex items-center justify-center z-0 scale-[0.75]">
         <RobotContainerSVG />
       </div>
-      
+
+      {/* Outer Ring */}
+      <div className="absolute w-[600px] h-[600px] rounded-full border border-slate-200/30 flex items-center justify-center z-0"></div>
+
+      {/* Orbital Nodes */}
+      {orbitalFeatures.map((feature, index) => {
+        const pos = calculateNodePosition(index, orbitalFeatures.length, 260, 25);
+        const IconComponent = feature.Icon;
+        const isSelected = hoveredFeature === feature.label;
+        
+        const handleClick = () => {
+          if (!isSelected) {
+            const targetAngle = (index / orbitalFeatures.length) * 360;
+            setRotationAngle(270 - targetAngle);
+          }
+          setHoveredFeature(isSelected ? null : feature.label);
+        };
+        
+        return (
+          <div
+            key={feature.label}
+            className="absolute flex items-center justify-center"
+            style={{
+              transform: `translate(${pos.x}px, ${pos.y}px)`,
+              zIndex: isSelected ? 100 : 10,
+            }}
+          >
+            <div 
+              className="relative group"
+              onClick={handleClick}
+            >
+              {/* Node */}
+              <div className={cn(
+                "w-16 h-16 rounded-full shadow-lg flex items-center justify-center transition-all cursor-pointer",
+                isSelected 
+                  ? "bg-gradient-to-br from-blue-500 to-cyan-500 border-2 border-blue-400 text-white scale-110 shadow-blue-200" 
+                  : "bg-white border-2 border-slate-200 text-slate-600 hover:scale-110 hover:border-blue-400 hover:bg-blue-50"
+              )}>
+                <IconComponent />
+              </div>
+
+              {/* Chat Popup Modal */}
+              <AnimatePresence>
+                {isSelected && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, x: -20 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, x: -20 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="absolute right-full mr-4 top-1/2 -translate-y-1/2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
+                    style={{ zIndex: 1000 }}
+                  >
+                    {/* Chat Header */}
+                    <div className="px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                        <div className="text-white scale-75">
+                          <IconComponent />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-white font-semibold text-sm">{feature.label}</div>
+                        <div className="text-white/80 text-xs">{feature.desc}</div>
+                      </div>
+                    </div>
+                    {/* Chat Messages */}
+                    <div className="p-4 space-y-3 bg-slate-50 max-h-40 overflow-y-auto">
+                      {feature.chat.map((msg, idx) => (
+                        <div key={idx} className={cn(
+                          "flex gap-2",
+                          msg.role === "user" && "flex-row-reverse"
+                        )}>
+                          <div className={cn(
+                            "w-7 h-7 rounded-full flex items-center justify-center shrink-0 shadow-sm",
+                            msg.role === "user" 
+                              ? "bg-gradient-to-br from-blue-500 to-cyan-500 text-white" 
+                              : "bg-gradient-to-br from-slate-600 to-slate-700 text-white"
+                          )}>
+                            {msg.role === "user" ? (
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            ) : (
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>
+                            )}
+                          </div>
+                          <div className={cn(
+                            "flex-1 px-3 py-2 rounded-2xl text-xs leading-relaxed shadow-sm",
+                            msg.role === "user" 
+                              ? "bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-tr-sm" 
+                              : "bg-white text-slate-700 rounded-tl-sm border border-slate-200"
+                          )}>
+                            {msg.text}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Input Box */}
+                    <div className="p-3 bg-white border-t border-slate-200">
+                      <div className="flex items-center gap-2 px-3 py-2.5 bg-slate-100 rounded-xl border border-slate-200 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-400 shrink-0">
+                          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <input 
+                          type="text" 
+                          placeholder="输入消息..." 
+                          className="flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
+                        />
+                        <button className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white hover:opacity-90 transition-opacity shrink-0">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Center Avatar */}
       <motion.div 
         className="relative z-10 flex items-center justify-center w-[440px] h-[330px]" 
         animate={{ x: mousePos.x, y: mousePos.y - 15 }} 
@@ -757,7 +1149,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="lg:col-span-6 h-[500px] relative hidden lg:flex items-center justify-center scale-100 origin-center">
+          <div className="lg:col-span-6 h-[600px] relative hidden lg:flex items-center justify-center scale-100 origin-center">
              <HeroRobotAvatar />
           </div>
         </div>
@@ -776,7 +1168,7 @@ export default function App() {
               </p>
             </div>
             
-            <div className="relative flex items-center justify-center w-full min-h-[300px]">
+            <div className="relative w-full h-[300px] md:h-[350px] -mx-6 md:mx-0">
                <MagnifiedBento />
             </div>
           </div>
@@ -842,50 +1234,108 @@ export default function App() {
                  <p className="text-slate-500 font-light text-sm">本地团队持续标注，让 AI 像原住民一样理解目的地的空间与细节。</p>
               </SurfaceCard>
             </div>
+
+            <div className="mt-24">
+              <div className="mb-12">
+                <h3 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-3">服务先行，消费自然发生。</h3>
+                <p className="text-lg text-slate-500 font-light">服务越自然，消费越顺畅。</p>
+              </div>
+
+              <p className="text-slate-600 text-lg font-light mb-12 max-w-3xl">帮助目的地销售的，不只是自己的商品，而是整个目的地的行中消费：</p>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                <SurfaceCard delay={0} className="!bg-gradient-to-br !from-blue-50 !to-blue-100/30 border-blue-200/50">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-200/50 flex items-center justify-center">
+                      <Building size={18} className="text-blue-600"/>
+                    </div>
+                    <span className="text-blue-600 font-bold text-sm uppercase tracking-wider">第一层</span>
+                  </div>
+                  <h4 className="text-xl font-bold text-slate-900 mb-4">目的地自营</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['客房升级', '餐饮', '纪念品', '门票加购', '园区二销', '增值服务'].map(item => (
+                      <span key={item} className="px-3 py-1.5 bg-white/80 rounded-full text-slate-600 text-sm font-medium border border-slate-200">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </SurfaceCard>
+
+                <SurfaceCard delay={100} className="!bg-gradient-to-br !from-green-50 !to-green-100/30 border-green-200/50">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-200/50 flex items-center justify-center">
+                      <Store size={18} className="text-green-600"/>
+                    </div>
+                    <span className="text-green-600 font-bold text-sm uppercase tracking-wider">第二层</span>
+                  </div>
+                  <h4 className="text-xl font-bold text-slate-900 mb-4">本地全品类</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['周边餐厅', '咖啡', '交通接驳', '租车', '本地特产', '周边景点'].map(item => (
+                      <span key={item} className="px-3 py-1.5 bg-white/80 rounded-full text-slate-600 text-sm font-medium border border-slate-200">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </SurfaceCard>
+
+                <SurfaceCard delay={200} className="!bg-gradient-to-br !from-amber-50 !to-amber-100/30 border-amber-200/50">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-200/50 flex items-center justify-center">
+                      <Sparkles size={18} className="text-amber-600"/>
+                    </div>
+                    <span className="text-amber-600 font-bold text-sm uppercase tracking-wider">第三层</span>
+                  </div>
+                  <h4 className="text-xl font-bold text-slate-900 mb-4">新体验经济</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['非遗体验', '手工课程', '徒步', '私人导览', '农场体验', '民俗活动'].map(item => (
+                      <span key={item} className="px-3 py-1.5 bg-white/80 rounded-full text-slate-600 text-sm font-medium border border-slate-200">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </SurfaceCard>
+              </div>
+
+              <p className="text-slate-500 text-base font-light mt-8 text-center">等本地特色供给</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* --- Section 4: 产品功能 (Pill Morph Tabs + Feature Carousel) --- */}
-      <section id="产品功能" className="py-32 relative z-10 bg-white">
-        <div className="max-w-[90rem] mx-auto px-6">
-          <PillMorphTabs
-            defaultValue="tourist"
-            headerLeft={
-              <div>
-                <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">一个智能体，两幅面孔。</h2>
-                <p className="text-lg text-slate-500 font-light">对外伴游，对内赋能。不仅是单点工具，更是完整商业系统。</p>
-              </div>
-            }
-            items={[
-              {
-                value: "tourist",
-                label: "游客看见什么",
-                panel: (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 16 }} 
-                    animate={{ opacity: 1, y: 0 }} 
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                  >
-                    <FeatureCarousel features={TOURIST_FEATURES} theme="light" />
-                  </motion.div>
-                )
-              },
-              {
-                value: "internal",
-                label: "内部看见什么",
-                panel: (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 16 }} 
-                    animate={{ opacity: 1, y: 0 }} 
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                  >
-                    <FeatureCarousel features={INTERNAL_FEATURES} theme="dark" />
-                  </motion.div>
-                )
-              }
-            ]}
-          />
+      {/* --- Section 4: 产品功能 (Feature108 Style) --- */}
+      <section id="产品功能" className="py-32 relative z-10">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col items-center gap-6 text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold">
+              <Sparkles size={12} /> 产品功能
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">一个智能体，两幅面孔。</h2>
+            <p className="text-lg text-slate-500 font-light max-w-2xl">对外伴游，对内赋能。不仅是单点工具，更是完整商业系统。</p>
+          </div>
+
+          {/* 游客看见什么 */}
+          <div className="mb-16">
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">游客看见什么</h3>
+              <p className="text-slate-500 max-w-xl mx-auto">对外伴游，让每一位游客享受专属服务体验</p>
+            </div>
+            <FeatureCarouselSection 
+              features={TOURIST_FEATURES} 
+              theme="light" 
+            />
+          </div>
+
+          {/* 内部看见什么 */}
+          <div>
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">内部看见什么</h3>
+              <p className="text-slate-500 max-w-xl mx-auto">对内赋能，让运营效率提升数倍</p>
+            </div>
+            <FeatureCarouselSection 
+              features={INTERNAL_FEATURES} 
+              theme="dark" 
+            />
+          </div>
         </div>
       </section>
 

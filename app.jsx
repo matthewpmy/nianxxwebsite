@@ -106,9 +106,10 @@ function calcRhythm(f) {
   return { bX, bY, blinkSc, mouthWobble, tilt, scaleX, scaleY };
 }
 
-const Esp32Face = ({ frame }) => {
+const Esp32Face = ({ frame, expressionId }) => {
+  const expId = expressionId || 'default_loop';
   const st = evalKf(defaultAnim, frame);
-  const r = calcRhythm(frame);
+  const r = calcRhythm(expId, frame);
 
   const fx = r.bX + (st.fx || 0);
   const fy = r.bY + (st.fy || 0);
@@ -219,9 +220,9 @@ function FeatureCarouselSection({ features, theme = "light" }) {
   };
 
   return (
-    <div className={cn("w-full flex flex-col lg:flex-row min-h-[600px] lg:aspect-video")}>
-      <div className={cn("w-full lg:w-[45%] min-h-[350px] md:min-h-[450px] lg:h-full relative z-30 flex flex-col items-start justify-center overflow-hidden px-8 md:px-16 lg:pl-16 py-12", bgColor)}>
-        <div className="relative w-full h-full flex items-center justify-center lg:justify-start z-20">
+    <div className="w-full flex flex-col">
+      <div className={cn("w-full min-h-[200px] md:min-h-[280px] relative z-30 flex flex-col items-center justify-center overflow-hidden px-8 py-8", bgColor)}>
+        <div className="relative w-full h-full flex items-center justify-center z-20">
           {features.map((feature, index) => {
             const isActive = index === currentIndex;
             const distance = index - currentIndex;
@@ -248,7 +249,7 @@ function FeatureCarouselSection({ features, theme = "light" }) {
                   onMouseEnter={() => setIsPaused(true)}
                   onMouseLeave={() => setIsPaused(false)}
                   className={cn(
-                    "relative flex items-center gap-4 px-6 md:px-10 lg:px-8 py-3.5 md:py-5 lg:py-4 rounded-full transition-all duration-700 text-left group border",
+                    "relative flex items-center gap-4 px-6 md:px-8 py-3 rounded-full transition-all duration-700 text-left group border",
                     isActive ? chipActiveBg : chipInactiveBg
                   )}
                 >
@@ -265,8 +266,8 @@ function FeatureCarouselSection({ features, theme = "light" }) {
         </div>
       </div>
 
-      <div className={cn("flex-1 min-h-[500px] md:min-h-[600px] lg:h-full relative flex items-center justify-center py-16 md:py-24 lg:py-16 px-6 md:px-12 lg:px-10 overflow-hidden", isDark ? "bg-slate-800/50" : "bg-slate-50")}>
-        <div className="relative w-full max-w-[420px] aspect-[4/5] flex items-center justify-center">
+      <div className={cn("w-full min-h-[300px] md:min-h-[400px] relative flex items-center justify-center overflow-hidden", isDark ? "bg-slate-800/50" : "bg-slate-50")}>
+        <div className="relative w-full max-w-[500px] aspect-[4/3] flex items-center justify-center">
           {features.map((feature, index) => {
             const status = getCardStatus(index);
             const isActive = status === "active";
@@ -291,7 +292,7 @@ function FeatureCarouselSection({ features, theme = "light" }) {
                   damping: 25,
                   mass: 0.8,
                 }}
-                className="absolute inset-0 rounded-[2rem] md:rounded-[2.8rem] overflow-hidden border-4 md:border-8 bg-background origin-center"
+                className="absolute inset-0 rounded-xl md:rounded-2xl overflow-hidden border-4 md:border-6 bg-background origin-center"
               >
                 <img
                   src={feature.image}
@@ -531,7 +532,28 @@ const HeroRobotAvatar = () => {
   const [frame, setFrame] = useState(0);
   const [rotationAngle, setRotationAngle] = useState(0);
   const [hoveredFeature, setHoveredFeature] = useState(null);
+  const [currentExpression, setCurrentExpression] = useState('default_loop');
   const containerRef = useRef(null);
+
+  const expressionList = [
+    'default_loop',
+    'talking', 
+    'open_eye', 
+    'very_happy', 
+    'happy_wink',
+    'sad',
+    'angry',
+    'cry',
+    'very_worried',
+    'sleep',
+    'question',
+  ];
+
+  const triggerRandomExpression = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * expressionList.length);
+    setCurrentExpression(expressionList[randomIndex]);
+    setTimeout(() => setCurrentExpression('default_loop'), 2000);
+  }, []);
 
   useEffect(() => {
     let timer = setInterval(() => {
@@ -658,6 +680,7 @@ const HeroRobotAvatar = () => {
             setRotationAngle(270 - targetAngle);
           }
           setHoveredFeature(isSelected ? null : feature.label);
+          triggerRandomExpression();
         };
         
         return (
@@ -764,11 +787,12 @@ const HeroRobotAvatar = () => {
 
       {/* Center Avatar */}
       <motion.div 
-        className="relative z-10 flex items-center justify-center w-[440px] h-[330px]" 
+        className="relative z-10 flex items-center justify-center w-[440px] h-[330px] cursor-pointer"
         animate={{ x: mousePos.x, y: mousePos.y - 15 }} 
         transition={{ type: "spring", stiffness: 250, damping: 20 }}
+        onClick={triggerRandomExpression}
       >
-        <Esp32Face frame={frame} />
+        <Esp32Face frame={frame} expressionId={currentExpression} />
       </motion.div>
     </motion.div>
   );
@@ -1158,12 +1182,12 @@ export default function App() {
       {/* --- Section 2: 市场洞察 --- */}
       <section className="py-24 relative z-10 border-t border-slate-100 bg-slate-50/50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center mb-24">
-            <div>
+          <div className="flex flex-col gap-12 mb-24">
+            <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-6 leading-tight">
                 <span className="text-blue-600 bg-blue-100/50 px-2 py-1 rounded-xl">40%</span> 的行程消费<br/>发生于抵达之后。
               </h2>
-              <p className="text-lg text-slate-500 font-light leading-relaxed max-w-md mb-8">
+              <p className="text-lg text-slate-500 font-light leading-relaxed">
                 餐饮、体验、购物与交通消费持续发生，却分散且低效。在最接近交易的黄金节点，市场亟需一个<strong className="font-bold text-slate-700">懂场景、懂游客、懂本地供给</strong>的智能入口。
               </p>
             </div>

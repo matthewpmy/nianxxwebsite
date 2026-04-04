@@ -412,7 +412,6 @@ function Face({ expId, mouth, frame=0, eyeSc=1, extras={}, animated=false, size 
   const W = size||VW, H = size ? Math.round(size*VH/VW) : VH;
   return (
     <svg viewBox={`0 0 ${VW} ${VH}`} width={W} height={H} style={{display:'block',flexShrink:0}}>
-      <rect width={VW} height={VH} fill="black"/>
       <FaceContent expId={expId} mouth={mouth} frame={frame} eyeSc={eyeSc} extras={extras} animated={animated} />
     </svg>
   );
@@ -991,3 +990,6 @@ const sideBtn = { display:'block', width:'100%', background:'transparent', color
 const ctrlBtn = { background:'transparent', color:'#777', border:'1.5px solid #1e1e30', borderRadius:7, padding:'8px 14px', cursor:'pointer', fontFamily:'inherit', fontSize:13, minWidth:44 };
 const miniBtn = { background:'transparent', color:'#444', border:'1px solid #15152a', borderRadius:5, padding:'4px 8px', cursor:'pointer', fontFamily:'inherit', fontSize:11 };
 const bigBtn = { padding:'13px 20px', borderRadius:8, border:'none', cursor:'pointer', fontFamily:'inherit', fontSize:14, fontWeight:700, width:'100%' };
+
+// ── 导出组件供外部使用 ─────────────────────────────────────────────────
+export { Face, FaceContent, MP, EXP, calcRhythm, evalKf, mpToD, DEFAULT_ANIMS, LOOP_F };

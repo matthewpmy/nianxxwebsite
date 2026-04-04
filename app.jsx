@@ -4,11 +4,269 @@ import {
   ArrowRight, ArrowUpRight, Map, Settings, ShoppingCart, 
   Building, Bot, LineChart, Sparkles, MessageSquare, 
   Smartphone, LayoutDashboard, Globe, Layers, Zap, ShieldCheck,
-  Utensils, Calendar, Navigation, Store, Clock, Ticket, Baby, Camera, HelpCircle, Coffee
+  Utensils, Calendar, Navigation, Store, Clock, Ticket, Baby, Camera, HelpCircle, Coffee,
+  Users, Database, Orbit
 } from 'lucide-react';
 import ButtonWithIcon from './components/ui/button-witn-icon';
 import ArrowButton from './components/ui/arrow-button';
 import { ShinyButton } from './components/ui/shiny-button';
+import { Face, DEFAULT_ANIMS, evalKf, calcRhythm, LOOP_F } from './EspMjpgEngine';
+import { AuroraBackground } from './components/ui/aurora-background';
+import { X } from 'lucide-react';
+
+// --- 0. 样式变量 (code.md) ---
+const GRAPHIC_BG = "bg-[#f4f7fb]";
+const GRID_DOTS = "radial-gradient(#cbd5e1 1px, transparent 1px)";
+const SOFT_SHADOW = "shadow-[0_20px_40px_rgba(0,0,0,0.03),0_1px_3px_rgba(0,0,0,0.02)]";
+const FLOATING_SHADOW = "shadow-[0_30px_60px_rgba(14,165,233,0.05),0_4px_10px_rgba(0,0,0,0.02)]";
+
+// Graphic 01: 资讯
+const GraphicOne = () => (
+  <div className={`relative w-full aspect-[16/10] ${GRAPHIC_BG} rounded-[2rem] flex items-center justify-center overflow-hidden`}>
+    <div className="absolute inset-0" style={{ backgroundImage: GRID_DOTS, backgroundSize: '24px 24px', opacity: 0.6 }} />
+    <div className="absolute w-[60%] h-[50%] bg-white/40 rounded-xl border border-white/50 backdrop-blur-sm -translate-y-6 translate-x-8" />
+    <div className="absolute w-[60%] h-[50%] bg-white/60 rounded-xl border border-white/60 backdrop-blur-md translate-y-6 -translate-x-8" />
+    <div className={`relative z-10 w-[65%] h-[60%] bg-white rounded-2xl border border-white ${FLOATING_SHADOW} p-5 flex flex-col justify-between transition-transform duration-700 hover:-translate-y-2`}>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+          <div className="w-3 h-3 bg-blue-400 rounded-full" />
+        </div>
+        <div className="flex flex-col gap-1.5 w-full">
+          <div className="w-1/3 h-2.5 bg-slate-200 rounded-full" />
+          <div className="w-1/5 h-2 bg-slate-100 rounded-full" />
+        </div>
+      </div>
+      <div className="space-y-2.5">
+        <div className="w-full h-2 bg-slate-100 rounded-full" />
+        <div className="w-[90%] h-2 bg-slate-100 rounded-full" />
+        <div className="w-[60%] h-2 bg-slate-100 rounded-full" />
+      </div>
+      <div className="mt-4 pt-4 border-t border-slate-50 flex justify-between">
+        <div className="w-16 h-6 bg-blue-50 rounded-md" />
+        <div className="w-16 h-6 bg-slate-50 rounded-md" />
+      </div>
+    </div>
+  </div>
+);
+
+// Graphic 02: 呼叫响应
+const GraphicTwo = () => (
+  <div className={`relative w-full aspect-[16/10] ${GRAPHIC_BG} rounded-[2rem] flex items-center justify-center overflow-hidden`}>
+    <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '100% 32px', opacity: 0.3 }} />
+    <div className={`relative z-10 w-48 h-48 bg-white rounded-full border border-white ${FLOATING_SHADOW} flex items-center justify-center transition-transform duration-700 hover:scale-105`}>
+      <div className="absolute w-[120%] h-[120%] border border-blue-100 rounded-full animate-[spin_10s_linear_infinite]">
+        <div className="absolute top-0 left-1/2 w-2 h-2 bg-blue-300 rounded-full -translate-x-1/2 -translate-y-1/2" />
+      </div>
+      <div className="absolute w-[140%] h-[140%] border border-slate-100 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+      <div className="flex items-center justify-center gap-1.5">
+        <div className="w-1.5 h-6 bg-slate-200 rounded-full" />
+        <div className="w-1.5 h-12 bg-blue-200 rounded-full" />
+        <div className="w-1.5 h-16 bg-blue-400 rounded-full" />
+        <div className="w-1.5 h-10 bg-blue-200 rounded-full" />
+        <div className="w-1.5 h-5 bg-slate-200 rounded-full" />
+      </div>
+    </div>
+  </div>
+);
+
+// Graphic 03: 需求感知
+const GraphicThree = () => (
+  <div className={`relative w-full aspect-[16/10] ${GRAPHIC_BG} rounded-[2rem] flex items-center justify-center overflow-hidden p-8`}>
+    <div className="absolute inset-0" style={{ backgroundImage: GRID_DOTS, backgroundSize: '16px 16px', opacity: 0.5 }} />
+    <div className="relative z-10 w-full h-full grid grid-cols-3 grid-rows-2 gap-4 transition-transform duration-700 hover:-translate-y-1">
+      <div className={`col-span-2 row-span-2 bg-white rounded-2xl border border-white ${SOFT_SHADOW} p-4 flex flex-col`}>
+        <div className="w-20 h-3 bg-slate-200 rounded-full mb-6" />
+        <div className="flex-1 flex items-end gap-3 px-2">
+          <div className="w-full h-[40%] bg-slate-100 rounded-t-md" />
+          <div className="w-full h-[60%] bg-blue-100 rounded-t-md" />
+          <div className="w-full h-[80%] bg-blue-300 rounded-t-md" />
+          <div className="w-full h-[50%] bg-slate-100 rounded-t-md" />
+          <div className="w-full h-[90%] bg-blue-400 rounded-t-md" />
+        </div>
+      </div>
+      <div className={`col-span-1 row-span-1 bg-white rounded-2xl border border-white ${SOFT_SHADOW} flex items-center justify-center relative overflow-hidden`}>
+        <div className="w-14 h-14 rounded-full border-[6px] border-slate-100 relative">
+          <div className="absolute -top-1 -right-1 w-[22px] h-[22px] border-[6px] border-blue-400 rounded-tr-full" style={{ borderBottomWidth: 0, borderLeftWidth: 0 }} />
+        </div>
+      </div>
+      <div className={`col-span-1 row-span-1 bg-white rounded-2xl border border-white ${SOFT_SHADOW} p-4 flex flex-col justify-between`}>
+        <div className="w-12 h-2.5 bg-slate-200 rounded-full" />
+        <div className="space-y-1.5">
+          <div className="w-full h-5 bg-blue-50 rounded flex items-center px-1"><div className="w-1/2 h-1 bg-blue-300 rounded-full" /></div>
+          <div className="w-full h-5 bg-slate-50 rounded flex items-center px-1"><div className="w-1/3 h-1 bg-slate-300 rounded-full" /></div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Graphic 04: 全程伴游
+const GraphicFour = () => (
+  <div className={`relative w-full aspect-[16/10] ${GRAPHIC_BG} rounded-[2rem] flex items-center justify-center overflow-hidden`}>
+    <div className="absolute w-[200%] h-px bg-gradient-to-r from-transparent via-green-200 to-transparent top-1/2 -translate-y-1/2 rotate-12 opacity-50" />
+    <div className="absolute w-[200%] h-px bg-gradient-to-r from-transparent via-green-200 to-transparent top-1/2 -translate-y-1/2 -rotate-12 opacity-50" />
+    <div className={`relative z-10 w-[70%] h-[70%] bg-white/90 backdrop-blur-xl rounded-2xl border border-white ${FLOATING_SHADOW} flex flex-col overflow-hidden transition-transform duration-700 hover:scale-[1.02]`}>
+      <div className="h-12 border-b border-slate-50 flex items-center px-4 gap-2">
+        <div className="w-2.5 h-2.5 rounded-full bg-slate-200" />
+        <div className="w-2.5 h-2.5 rounded-full bg-slate-200" />
+        <div className="w-16 h-2 bg-slate-100 rounded-full ml-2" />
+      </div>
+      <div className="flex-1 p-4 flex flex-col gap-4">
+        <div className="flex gap-3 w-[80%]">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-200 to-green-400 shrink-0 shadow-inner flex items-center justify-center">
+            <div className="w-3 h-3 bg-white rounded-full" />
+          </div>
+          <div className="flex-1 bg-slate-50 rounded-2xl rounded-tl-sm p-3 space-y-2">
+            <div className="w-[90%] h-2 bg-slate-200 rounded-full" />
+            <div className="w-[60%] h-2 bg-slate-200 rounded-full" />
+          </div>
+        </div>
+        <div className="flex gap-3 w-[70%] self-end">
+          <div className="flex-1 bg-green-50 border border-green-100 rounded-2xl rounded-tr-sm p-3 space-y-2">
+            <div className="w-full h-2 bg-green-300 rounded-full" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Graphic 05: 商品智荐
+const GraphicFive = () => (
+  <div className={`relative w-full aspect-[16/10] ${GRAPHIC_BG} rounded-[2rem] flex items-center justify-center overflow-hidden perspective-[1000px]`}>
+    <div className="absolute w-64 h-64 bg-green-100/50 rounded-full blur-[50px]" />
+    <div className="relative w-48 h-64 transition-transform duration-700 group hover:-translate-y-2" style={{ transformStyle: 'preserve-3d' }}>
+      <div className={`absolute inset-0 bg-white rounded-xl border border-slate-100 ${SOFT_SHADOW} transform rotate-6 translate-x-4 translate-y-2 origin-bottom-right p-4 flex flex-col opacity-80`}>
+        <div className="w-full aspect-square bg-slate-100 rounded-lg mb-3" />
+        <div className="w-2/3 h-2 bg-slate-200 rounded-full" />
+      </div>
+      <div className={`absolute inset-0 bg-white rounded-xl border border-slate-100 ${SOFT_SHADOW} transform -rotate-3 -translate-x-4 translate-y-1 origin-bottom-left p-4 flex flex-col opacity-90`}>
+        <div className="w-full aspect-square bg-slate-100 rounded-lg mb-3" />
+        <div className="w-2/3 h-2 bg-slate-200 rounded-full" />
+      </div>
+      <div className={`absolute inset-0 bg-white/95 backdrop-blur-sm rounded-xl border border-white ${FLOATING_SHADOW} p-4 flex flex-col transform transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-4`}>
+        <div className="w-full aspect-square bg-green-50 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+          <div className="absolute w-[150%] h-4 bg-white/40 rotate-45 transform translate-x-[-100%] transition-transform duration-1000 group-hover:translate-x-[100%]" />
+          <div className="w-12 h-12 border-2 border-green-200 rounded-md" />
+        </div>
+        <div className="w-3/4 h-3 bg-slate-800/10 rounded-full mb-2" />
+        <div className="w-1/2 h-2 bg-slate-300 rounded-full mb-auto" />
+        <div className="flex justify-between items-center pt-3 border-t border-slate-50 mt-2">
+          <div className="w-8 h-3 bg-green-400/20 rounded-full" />
+          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+            <div className="w-3 h-0.5 bg-white rounded-full relative"><div className="w-0.5 h-3 bg-white rounded-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Graphic 06: 一站式预约 (多合一预订面板与打孔票务)
+const GraphicSix = () => (
+  <div className={`relative w-full aspect-[16/10] ${GRAPHIC_BG} rounded-[2rem] flex items-center justify-center overflow-hidden p-6`}>
+    <div className="absolute inset-0" style={{ backgroundImage: GRID_DOTS, backgroundSize: '20px 20px', opacity: 0.6 }}></div>
+
+    {/* 主干聚合面板 */}
+    <div className={`relative z-10 w-[90%] h-[85%] bg-white/95 backdrop-blur-xl rounded-2xl border border-white ${FLOATING_SHADOW} p-4 flex gap-4 transition-transform duration-700 hover:scale-[1.02]`}>
+      
+      {/* 左侧：服务聚合菜单 (隐喻一站式选择) */}
+      <div className="w-[35%] h-full flex flex-col gap-2.5 border-r border-slate-50 pr-4">
+        <div className="w-16 h-2.5 bg-slate-200 rounded-full mb-2"></div>
+        
+        {/* 激活的服务分类 */}
+        <div className="w-full h-9 bg-green-50 rounded-lg flex items-center px-2.5 gap-2.5 border border-green-100">
+          <div className="w-4 h-4 bg-green-200 rounded flex-shrink-0"></div>
+          <div className="flex flex-col gap-1.5 w-full">
+            <div className="w-1/2 h-1.5 bg-green-400 rounded-full"></div>
+            <div className="w-1/3 h-1 bg-green-200 rounded-full"></div>
+          </div>
+        </div>
+        
+        {/* 未激活的服务分类 */}
+        <div className="w-full h-9 flex items-center px-2.5 gap-2.5">
+          <div className="w-4 h-4 bg-slate-100 rounded flex-shrink-0"></div>
+          <div className="flex flex-col gap-1.5 w-full">
+            <div className="w-2/3 h-1.5 bg-slate-200 rounded-full"></div>
+            <div className="w-1/2 h-1 bg-slate-100 rounded-full"></div>
+          </div>
+        </div>
+
+        <div className="w-full h-9 flex items-center px-2.5 gap-2.5">
+          <div className="w-4 h-4 bg-slate-100 rounded flex-shrink-0"></div>
+          <div className="flex flex-col gap-1.5 w-full">
+            <div className="w-1/2 h-1.5 bg-slate-200 rounded-full"></div>
+            <div className="w-1/4 h-1 bg-slate-100 rounded-full"></div>
+          </div>
+        </div>
+
+        {/* 底部一键预订按钮 */}
+        <div className="mt-auto w-full h-8 bg-green-500 rounded-lg flex items-center justify-center shadow-sm shadow-green-500/20">
+          <div className="w-16 h-1.5 bg-white/80 rounded-full"></div>
+        </div>
+      </div>
+
+      {/* 右侧：多订单叠放与打孔票据 (隐喻所有预订生成一张凭证) */}
+      <div className="flex-1 h-full relative flex flex-col items-center justify-center">
+         {/* 底层阴影卡片 - 表现多订单合并 */}
+         <div className="absolute w-[80%] h-[90%] bg-slate-50 rounded-xl border border-slate-100 transform translate-y-3 -rotate-6 opacity-60"></div>
+         <div className="absolute w-[85%] h-[90%] bg-white rounded-xl border border-slate-100 transform translate-y-1.5 rotate-3 opacity-80 shadow-sm"></div>
+         
+         {/* 顶层主票据 */}
+         <div className={`relative w-[90%] h-[95%] bg-gradient-to-b from-green-50/40 to-white rounded-xl border border-slate-100 ${SOFT_SHADOW} flex flex-col overflow-hidden`}>
+            
+            {/* 票务核心信息区 */}
+            <div className="h-[40%] p-4 flex flex-col justify-center gap-3">
+               <div className="flex justify-between items-center px-1">
+                 <div className="w-8 h-2.5 bg-green-300 rounded-full"></div>
+                 <div className="flex-1 mx-3 border-b-2 border-dotted border-green-200 relative">
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-0 h-0 border-y-[3px] border-y-transparent border-l-[5px] border-l-green-300"></div>
+                 </div>
+                 <div className="w-8 h-2.5 bg-green-300 rounded-full"></div>
+               </div>
+               <div className="flex justify-between px-1">
+                 <div className="w-10 h-1.5 bg-slate-300 rounded-full"></div>
+                 <div className="w-10 h-1.5 bg-slate-300 rounded-full"></div>
+               </div>
+            </div>
+
+            {/* 物理打孔与虚线分割 */}
+            <div className="relative w-full h-0">
+               <div className="absolute top-0 left-0 w-full border-t-2 border-dashed border-slate-200"></div>
+               {/* 左右缺口 - 完美伪造物理纸张裁剪感 */}
+               <div className="absolute top-0 -left-3 w-6 h-6 bg-white rounded-full border border-slate-100 -translate-y-1/2 shadow-inner"></div>
+               <div className="absolute top-0 -right-3 w-6 h-6 bg-white rounded-full border border-slate-100 -translate-y-1/2 shadow-inner"></div>
+            </div>
+
+            {/* 条码与价格结算区 */}
+            <div className="flex-1 p-4 flex flex-col justify-between items-center">
+               <div className="w-full flex justify-between items-end mb-2">
+                 <div className="flex flex-col gap-1.5">
+                   <div className="w-12 h-1.5 bg-slate-200 rounded-full"></div>
+                   <div className="w-16 h-2 bg-slate-300 rounded-full"></div>
+                 </div>
+                 <div className="w-10 h-3 bg-green-500 rounded-full"></div>
+               </div>
+               
+               {/* 拟物条形码骨架 */}
+               <div className="w-full h-8 flex gap-[3px] items-center justify-center opacity-30 mt-auto">
+                 <div className="w-1 h-full bg-slate-800 rounded-sm"></div>
+                 <div className="w-2 h-full bg-slate-800 rounded-sm"></div>
+                 <div className="w-1.5 h-full bg-slate-800 rounded-sm"></div>
+                 <div className="w-0.5 h-full bg-slate-800 rounded-sm"></div>
+                 <div className="w-2 h-full bg-slate-800 rounded-sm"></div>
+                 <div className="w-1 h-full bg-slate-800 rounded-sm"></div>
+                 <div className="w-0.5 h-full bg-slate-800 rounded-sm"></div>
+                 <div className="w-1.5 h-full bg-slate-800 rounded-sm"></div>
+                 <div className="w-2 h-full bg-slate-800 rounded-sm"></div>
+                 <div className="w-1 h-full bg-slate-800 rounded-sm"></div>
+               </div>
+            </div>
+         </div>
+      </div>
+    </div>
+  </div>
+);
 
 // --- 1. 工具函数 ---
 const cn = (...classes) => classes.filter(Boolean).join(' ');
@@ -52,93 +310,9 @@ const useScrollReveal = (delay = 0) => {
   return [domRef, isVisible];
 };
 
-// --- 2. ESP32 动画引擎核心逻辑 (提取 default_loop) ---
-const LOOP_F = 90;
-const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-const lerp = (a, b, t) => a + (b - a) * t;
-const lerpMP = (a, b, t) => a.map((v, i) => lerp(v, b[i], t));
-const eio = t => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+// --- 2. ESP32 动画引擎核心逻辑 (使用 EspMjpgEngine 导入的版本) ---
 
-const MP = {
-  default: [188, 126, 188, 126, 183.772, 150, 160, 150, 136.228, 150, 132, 126, 132, 126],
-  default_up: [186, 124, 186, 124, 182, 148, 160, 149, 138, 148, 134, 124, 134, 124],
-};
-const mpToD = p => `M${p[0]},${p[1]} C${p[2]},${p[3]} ${p[4]},${p[5]} ${p[6]},${p[7]} C${p[8]},${p[9]} ${p[10]},${p[11]} ${p[12]},${p[13]}`;
-
-const K = (f, mk, ex = {}) => ({ f, mouth: [...MP[mk || "default"]], fx: 0, fy: 0, sx: 1, sy: 1, rot: 0, ...ex });
-
-const defaultAnim = {
-  keyframes: [K(0, "default"), K(22, "default_up"), K(45, "default"), K(67, "default_up"), K(89, "default")]
-};
-
-function evalKf(anim, frame) {
-  const kfs = anim.keyframes;
-  let p = kfs[0], n = kfs[kfs.length - 1];
-  for (let i = 0; i < kfs.length - 1; i++) {
-    if (frame >= kfs[i].f && frame <= kfs[i + 1].f) { p = kfs[i]; n = kfs[i + 1]; break; }
-  }
-  if (p === n) return { ...p };
-  const t = eio(clamp((frame - p.f) / (n.f - p.f), 0, 1));
-  return {
-    mouth: lerpMP(p.mouth, n.mouth, t),
-    fx: lerp(p.fx || 0, n.fx || 0, t),
-    fy: lerp(p.fy || 0, n.fy || 0, t),
-    sx: lerp(p.sx || 1, n.sx || 1, t),
-    sy: lerp(p.sy || 1, n.sy || 1, t),
-    rot: lerp(p.rot || 0, n.rot || 0, t),
-  };
-}
-
-function calcRhythm(f) {
-  const s = Math.sin;
-  let bX = 0, bY = 0, blinkSc = 1, mouthWobble = 0, tilt = 0, scaleX = 1, scaleY = 1;
-  const breathPhase = s(f * 0.105);
-  scaleY = 1 + breathPhase * 0.025;
-  scaleX = 1 - breathPhase * 0.012;
-  bY = breathPhase * 3;
-  const seg = Math.floor(f / 30) % 3;
-  const segP = eio(clamp((f % 30) / 20, 0, 1));
-  tilt = seg === 0 ? lerp(0, -2.5, segP) : seg === 1 ? lerp(-2.5, 2.5, segP) : lerp(2.5, 0, segP);
-  bX = tilt * 0.4;
-  mouthWobble = breathPhase * 1.2;
-  if (f >= 28 && f <= 29) blinkSc = 0.05;
-  else if (f >= 68 && f <= 70) blinkSc = f === 69 ? 0.05 : 0.3;
-  return { bX, bY, blinkSc, mouthWobble, tilt, scaleX, scaleY };
-}
-
-const Esp32Face = ({ frame, expressionId }) => {
-  const expId = expressionId || 'default_loop';
-  const st = evalKf(defaultAnim, frame);
-  const r = calcRhythm(expId, frame);
-
-  const fx = r.bX + (st.fx || 0);
-  const fy = r.bY + (st.fy || 0);
-  const rot = r.tilt + (st.rot || 0);
-  const sx = r.scaleX * (st.sx || 1);
-  const sy = r.scaleY * (st.sy || 1);
-
-  const finalTransform = `translate(${160 + fx}, ${120 + fy}) rotate(${rot}) scale(${sx}, ${sy}) translate(-160, -120)`;
-
-  return (
-    <svg viewBox="0 0 320 240" width="100%" height="100%" style={{ display: 'block', overflow: 'visible' }}>
-      <g transform={finalTransform}>
-        <path
-          d={mpToD(st.mouth)}
-          stroke="white"
-          strokeWidth="12"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          transform={r.mouthWobble ? `translate(0, ${r.mouthWobble})` : undefined}
-        />
-        <g style={{ transformOrigin: '160px 112px', transform: `scaleY(${r.blinkSc})` }}>
-          <ellipse cx="80" cy="112" rx="16" ry="24" fill="white" />
-          <ellipse cx="240" cy="112" rx="16" ry="24" fill="white" />
-        </g>
-      </g>
-    </svg>
-  );
-};
+// Face 组件已从 EspMjpgEngine.jsx 导入
 
 // --- 3. 数据集 ---
 const TOURIST_QUERIES = [
@@ -170,12 +344,321 @@ const TOURIST_FEATURES = [
 ];
 
 const INTERNAL_FEATURES = [
-  { id: "zap", label: "操作类：减错提效", icon: Zap, image: "https://images.unsplash.com/photo-1551288049-bbda38a10ad5?q=80&w=1200", description: "酒店开关房、货盘追踪、PMS系统与票务状态实时自动更新。" },
+  { id: "zap", label: "操作类：减错提效", icon: Zap, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200", description: "酒店开关房、货盘追踪、PMS系统与票务状态实时自动更新。" },
   { id: "layers", label: "流程类：稳定复制", icon: Layers, image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200", description: "智能派发工单，自动生成运营日报、月报及全渠道营销文案。" },
   { id: "chart", label: "思考类：辅助决策", icon: LineChart, image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200", description: "深度智能问数分析，市场动态代理调价，数据驱动的精准推荐。" },
   { id: "design", label: "设计类：统一高效", icon: Sparkles, image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=1200", description: "AIGC 高质量海报与短视频生成，符合企业特性的定制 IP 建模。" },
   { id: "settings", label: "定制类：降本增效", icon: Settings, image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200", description: "游客合照智能优化，自动化满意度问卷，精准规划专属电子地图。" },
 ];
+
+// ==========================================
+// 方案 B: 浅色全息枢纽数据字典
+// ==========================================
+const CORE_TITLE = "私有核心资产";
+const METRICS = [
+  { value: "24/7", label: "全天候", icon: Clock },
+  { value: "99.9%", label: "响应速度", icon: Zap },
+  { value: "∞", label: "持续学习", icon: Sparkles },
+];
+
+const FEATURES = [
+  { id: "platform", title: "平台私有化", desc: "独立部署，数据自主。深度定制、安全可控、灵活扩展。", color: "blue", icon: ShieldCheck },
+  { id: "brand", title: "品牌独立化", desc: "定制IP，形象统一。打造专属品牌形象与用户认知。", color: "indigo", icon: Building },
+  { id: "relationship", title: "关系资产化", desc: "用户关系，深度沉淀。建立持续优化的用户粘性。", color: "emerald", icon: Users },
+  { id: "data", title: "数据自主化", desc: "第一方数据，安全可控。数据驱动精准运营决策。", color: "violet", icon: Database },
+];
+
+// ==========================================
+// 浅色全息枢纽组件
+// ==========================================
+const ConceptLightNexus = () => (
+  <section id="解决方案" className="min-h-screen bg-[#f8fafc] overflow-hidden flex items-center justify-center py-24 relative">
+    {/* 浅色网格与环境光 */}
+    <div className="absolute inset-0 opacity-[0.4]" style={{ backgroundImage: 'linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-blue-100/50 rounded-full blur-[100px] pointer-events-none"></div>
+
+    <div className="max-w-[1200px] w-full mx-auto px-6 relative z-10 flex flex-col items-center">
+      
+      {/* 顶部玻璃态 HUD (Data Strip) */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="w-full max-w-4xl bg-white/70 backdrop-blur-xl border border-white rounded-3xl p-6 md:p-8 flex flex-wrap justify-between items-center mb-16 shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
+      >
+         <div className="text-slate-800 pr-8 border-r border-slate-200">
+           <h2 className="text-[28px] font-bold tracking-tight">{CORE_TITLE}</h2>
+           <p className="text-xs text-blue-500 mt-1 uppercase tracking-widest font-semibold">Core Infrastructure</p>
+         </div>
+         <div className="flex flex-1 justify-around pl-4">
+           {METRICS.map((m, i) => (
+             <motion.div 
+               key={i} 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.5, delay: i * 0.1 }}
+               viewport={{ once: true }}
+               className="flex flex-col items-center"
+             >
+                <span className="text-[28px] md:text-[32px] font-extrabold text-slate-800">{m.value}</span>
+                <span className="text-[11px] text-slate-500 uppercase tracking-widest mt-1 flex items-center gap-1 font-medium"><m.icon className="w-3.5 h-3.5 text-blue-400"/> {m.label}</span>
+             </motion.div>
+           ))}
+         </div>
+      </motion.div>
+
+      {/* 中心能量枢纽布局 */}
+      <div className="relative w-full max-w-5xl aspect-[4/3] md:aspect-auto md:min-h-[600px] mt-10 flex items-center justify-center">
+         
+         {/* 发光中心球 (Light Core) */}
+         <motion.div 
+           initial={{ scale: 0, opacity: 0 }}
+           whileInView={{ scale: 1, opacity: 1 }}
+           transition={{ duration: 0.8, delay: 0.3 }}
+           viewport={{ once: true }}
+           className="w-40 h-40 md:w-48 md:h-48 bg-gradient-to-br from-white to-blue-50 rounded-full flex items-center justify-center shadow-[0_0_80px_rgba(59,130,246,0.2),inset_0_10px_20px_rgba(255,255,255,1)] z-20 border-4 border-white animate-[pulse_4s_ease-in-out_infinite] shrink-0"
+         >
+            <Orbit className="w-14 h-14 md:w-16 md:h-16 text-blue-500" strokeWidth={1.5} />
+            <div className="absolute inset-0 rounded-full border-2 border-blue-100 animate-ping"></div>
+         </motion.div>
+
+         {/* 环绕卡片 (Orbiting Cards) */}
+         <div className="absolute inset-0">
+            {FEATURES.map((feature, i) => {
+              const positions = [
+                "top-0 left-0 md:top-10 md:left-10",
+                "top-0 right-0 md:top-10 md:right-10",
+                "bottom-0 left-0 md:bottom-10 md:left-10",
+                "bottom-0 right-0 md:bottom-10 md:right-10"
+              ];
+              const colors = [
+                { bg: "bg-blue-50", border: "border-blue-100", text: "text-blue-500", line: "from-blue-200 to-transparent" },
+                { bg: "bg-indigo-50", border: "border-indigo-100", text: "text-indigo-500", line: "from-indigo-200 to-transparent" },
+                { bg: "bg-emerald-50", border: "border-emerald-100", text: "text-emerald-500", line: "from-emerald-200 to-transparent" },
+                { bg: "bg-violet-50", border: "border-violet-100", text: "text-violet-500", line: "from-violet-200 to-transparent" }
+              ];
+              const lineStyles = [
+                 `top-[50%] left-[100%] w-32 h-px bg-gradient-to-r ${colors[i].line} transform rotate-45 origin-left`,
+                 `top-[50%] right-[100%] w-32 h-px bg-gradient-to-l ${colors[i].line} transform -rotate-45 origin-right`,
+                 `top-[50%] left-[100%] w-32 h-px bg-gradient-to-r ${colors[i].line} transform -rotate-45 origin-left`,
+                 `top-[50%] right-[100%] w-32 h-px bg-gradient-to-l ${colors[i].line} transform rotate-45 origin-right`
+              ];
+              
+              return (
+                <motion.div
+                  key={feature.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: i * 0.15 }}
+                  viewport={{ once: true }}
+                  className={`absolute ${positions[i]} w-[45%] md:w-[320px] bg-white/80 backdrop-blur-xl border border-white p-6 rounded-3xl hover:bg-white transition-all duration-300 group cursor-pointer z-30 shadow-[0_20px_40px_rgba(0,0,0,0.04)] hover:-translate-y-2`}
+                >
+                   <div className="flex items-center gap-4 mb-4">
+                      <div className={`w-12 h-12 ${colors[i].bg} rounded-xl flex items-center justify-center border ${colors[i].border}`}>
+                         <feature.icon className={`w-6 h-6 ${colors[i].text}`} />
+                      </div>
+                      <h3 className="text-slate-800 font-bold text-lg">{feature.title}</h3>
+                   </div>
+                   <p className="text-slate-500 text-sm leading-relaxed">{feature.desc}</p>
+                   {/* 隐喻连接线 */}
+                   <div className={`hidden md:block absolute ${lineStyles[i]} pointer-events-none`}></div>
+                </motion.div>
+              )
+            })}
+         </div>
+      </div>
+    </div>
+  </section>
+);
+
+const CASES = [
+  { 
+    name: '荔波小七孔', 
+    ai: '七妹智能体', 
+    type: '景区', 
+    image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800',
+    desc: '世界自然遗产地，游客可通过七妹智能体获取实时导览、景点推荐与门票预约服务。'
+  },
+  { 
+    name: '凯里下司古镇', 
+    ai: '阿糯智能体', 
+    type: '古镇', 
+    image: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=800',
+    desc: '体验当地特色民俗文化，阿糯智能体提供专属导览与手工艺品预约服务。'
+  },
+  { 
+    name: '息烽天沐温泉', 
+    ai: '沐沐智能体', 
+    type: '温泉度假区', 
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800',
+    desc: '沐沐智能体为游客提供温泉预约、水疗推荐与周边餐饮指引服务。'
+  },
+  { 
+    name: '云从朵花酒店', 
+    ai: '朵朵智能体', 
+    type: '酒店', 
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+    desc: '朵朵智能体提供入住指引、客房服务与本地旅游推荐，打造智能入住体验。'
+  },
+];
+
+// ==========================================
+// 游客视角卡片数据 (code-two.md)
+// ==========================================
+const TOURIST_CARDS = [
+  { 
+    id: 't1', 
+    type: 'tourist', 
+    title: '景点推荐与预订', 
+    desc: '整合实时运营状态与口碑，提供无缝体验预订与精准推荐。', 
+    detailedDesc: '深度打通目的地实时客流、天气状况与全网真实口碑，通过大模型引擎构建动态知识图谱。不仅能为游客提供个性化的避障与游玩路线规划，更从底层打通了支付与核销系统。真正实现从"种草-决策-预订-体验"的无缝闭环。', 
+    image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200' 
+  },
+  { 
+    id: 't2', 
+    type: 'tourist', 
+    title: '即时呼叫服务', 
+    desc: '语音交互，随时响应延迟退房、活动报名等即时需求。', 
+    detailedDesc: '搭载支持多语种、带有情感计算的自然语言处理引擎。无论是清晨要求延迟退房，还是深夜的紧急求助呼叫，系统均能做到毫秒级精准意图识别并自动流转工单给相应部门。提供 7x24 小时零延迟、带有温度的专属管家服务。', 
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200' 
+  },
+  { 
+    id: 't3', 
+    type: 'tourist', 
+    title: '延续性伴游记忆', 
+    desc: '持续感知游客偏好，记忆延续，告别千篇一律的机械推荐。', 
+    detailedDesc: 'AI 智能体会持续学习并记录游客的每一次交互、偏好标签与消费习惯，沉淀为专属 User Profile。当游客跨越不同场景，或下一次复游时，服务能做到无缝接续，主动屏蔽已排斥选项，真正实现"越用越懂你"的陪伴。', 
+    image: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?q=80&w=1200' 
+  },
+  { 
+    id: 't4', 
+    type: 'tourist', 
+    title: '现实场景交互', 
+    desc: '联动线下随身机器人与硬件，跨越屏幕主动提供人性化服务。', 
+    detailedDesc: '突破数字屏幕限制，让 AI 拥有物理载体。系统深度联动景区内的智能向导车、酒店配送机器人及 IoT 硬件。当游客靠近特定区域时，不仅手机端有向导推送，实体机器人也能主动识别、迎宾带路，打造虚实共生的未来文旅体验。', 
+    image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=1200' 
+  }
+];
+
+// ==========================================
+// 内部视角卡片数据 (code-two.md)
+// ==========================================
+const INTERNAL_CARDS = [
+  { 
+    id: 'i1', 
+    type: 'internal', 
+    title: '操作类：减错提效', 
+    desc: '酒店开关房、货盘追踪、PMS系统与票务状态实时自动更新。', 
+    detailedDesc: '针对日常操作提供 RPA 级别系统赋能。员工无需跨系统反复录入，智能体能自动同步 PMS 房态、执行库存盘点、货盘追踪及多渠道票务状态更新。将一线员工从枯燥操作中解放，实现真正降本与减错。', 
+    image: 'https://images.unsplash.com/photo-1551288049-bbda38a10ad5?q=80&w=1200' 
+  },
+  { 
+    id: 'i2', 
+    type: 'internal', 
+    title: '流程类：稳定复制', 
+    desc: '智能派发工单，自动生成运营日报、月报及全渠道营销文案。', 
+    detailedDesc: '将企业优秀运营经验沉淀为算法模型。全天候监听业务异常节点并智能流转工单。同时基于海量数据，一键自动生成高度结构化的日/月报，更能批量生成符合小红书、抖音等语境的高转化营销文案。', 
+    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200' 
+  },
+  { 
+    id: 'i3', 
+    type: 'internal', 
+    title: '思考类：辅助决策', 
+    desc: '深度智能问数分析，市场动态代理调价，数据驱动的精准推荐。', 
+    detailedDesc: '为管理层配备 24 小时在线的数据科学家。支持自然语言"问数"交互，秒级生成可视化洞察。更具备市场动态调价功能，依据竞品动态与供需曲线自动计算最优收益率价格，实现敏捷商业决策。', 
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200' 
+  },
+  { 
+    id: 'i4', 
+    type: 'internal', 
+    title: '设计类：统一高效', 
+    desc: 'AIGC 高质量海报与短视频生成，符合企业特性的定制 IP 建模。', 
+    detailedDesc: '突破内容创作产能瓶颈。内置专属品牌微调大模型，输入简单 Prompt 即可大批量生成活动海报、短视频脚本，乃至构建符合品牌调性的 3D 虚拟 IP。保证品牌视觉高度统一，将物料产出周期缩短至秒级。', 
+    image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=1200' 
+  },
+  { 
+    id: 'i5', 
+    type: 'internal', 
+    title: '定制类：降本增效', 
+    desc: '游客合照智能优化，自动化满意度问卷，精准规划专属电子地图。', 
+    detailedDesc: '关注高频服务触点创新。利用端侧 AI 为游客自动合成完美打卡合照提升分享意愿；在最佳情绪触点自动触发交互问卷；基于游客偏好一键生成专属纪念地图，用极低边际成本创造无量情绪价值。', 
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200' 
+  }
+];
+
+// ==========================================
+// 沉浸式详情弹窗组件
+// ==========================================
+const DetailModal = ({ card, onClose }) => {
+  if (!card) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 opacity-100 transition-opacity duration-300">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={onClose}></div>
+      <div className="relative w-full max-w-5xl bg-white/95 backdrop-blur-2xl rounded-[2rem] shadow-[0_0_80px_rgba(0,0,0,0.15)] border border-white/40 flex flex-col md:flex-row overflow-hidden animate-[in_0.3s_ease-out]">
+        <button onClick={onClose} className="absolute top-4 right-4 z-20 w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center transition-colors">
+          <X className="w-5 h-5" />
+        </button>
+        
+        {/* 左侧大图展示区 */}
+        <div className="w-full md:w-[45%] bg-slate-50 min-h-[300px] md:min-h-[500px] flex items-center justify-center p-4">
+          <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm bg-slate-100">
+            <img 
+              src={card.image} 
+              alt={card.title} 
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        {/* 右侧文本区 */}
+        <div className="w-full md:w-[55%] p-8 md:p-12 flex flex-col justify-center overflow-y-auto">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 font-semibold text-[12px] uppercase tracking-wider rounded-md mb-6 w-fit">
+            <Sparkles className="w-3.5 h-3.5" /> {card.type === 'tourist' ? 'Tourist Perspective' : 'Internal Perspective'}
+          </div>
+          <h2 className="text-[32px] md:text-[40px] font-bold text-slate-900 leading-tight tracking-tight mb-4">{card.title}</h2>
+          <p className="text-[18px] text-slate-600 font-medium mb-8 pb-8 border-b border-slate-100 leading-relaxed">{card.desc}</p>
+          <div className="space-y-6 text-[16px] text-slate-500 leading-[1.8] font-normal">
+            {card.detailedDesc.split('。').filter(Boolean).map((s, i) => <p key={i}>{s + '。'}</p>)}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// 画廊卡片组件
+// ==========================================
+const GalleryCard = ({ card, onSelect }) => {
+  return (
+    <div className="shrink-0 w-[85vw] md:w-[40vw] h-[55vh] md:h-[65vh] flex flex-col group cursor-pointer" onClick={() => onSelect(card)}>
+      <div className="w-full h-full bg-white rounded-3xl p-2 shadow-sm shadow-slate-200/20 border border-white flex flex-col overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-sm">
+         
+         {/* 图片容器区 */}
+         <div className="relative w-full flex-1 rounded-2xl overflow-hidden bg-slate-100">
+            <img
+              src={card.image}
+              alt={card.title}
+              className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-[11px] font-bold text-slate-600 uppercase tracking-widest shadow-sm">
+              {card.type}
+            </div>
+         </div>
+
+         {/* 文本区 */}
+         <div className="p-6 h-32 flex flex-col justify-center" dir="ltr">
+            <h3 className="text-[22px] font-bold text-slate-900 tracking-tight">{card.title}</h3>
+            <div className="mt-2 flex items-center text-blue-500 font-semibold text-sm opacity-0 transform translate-x-[-10px] transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+              查阅详情 <ArrowRight className="w-4 h-4 ml-1" />
+            </div>
+         </div>
+      </div>
+    </div>
+  );
+};
 
 // --- Feature Carousel Component ---
 function FeatureCarouselSection({ features, theme = "light" }) {
@@ -188,7 +671,6 @@ function FeatureCarouselSection({ features, theme = "light" }) {
   const chipInactiveBg = isDark ? "bg-transparent text-white/60 border-white/20 hover:border-white/40 hover:text-white" : "bg-transparent text-white/60 border-white/20 hover:border-white/40 hover:text-white";
   const iconActiveColor = isDark ? "text-slate-900" : "text-blue-500";
   const iconInactiveColor = isDark ? "text-white/40" : "text-white/40";
-  const headerBg = isDark ? "bg-white/10 border-white/20 text-white/80" : "bg-white border border-slate-200 text-slate-600";
 
   const currentIndex = ((step % features.length) + features.length) % features.length;
 
@@ -207,6 +689,10 @@ function FeatureCarouselSection({ features, theme = "light" }) {
     return () => clearInterval(interval);
   }, [nextStep, isPaused]);
 
+  useEffect(() => {
+    setStep(0);
+  }, [features]);
+
   const getCardStatus = (index) => {
     const diff = index - currentIndex;
     const len = features.length;
@@ -220,9 +706,9 @@ function FeatureCarouselSection({ features, theme = "light" }) {
   };
 
   return (
-    <div className="w-full flex flex-col">
-      <div className={cn("w-full min-h-[200px] md:min-h-[280px] relative z-30 flex flex-col items-center justify-center overflow-hidden px-8 py-8", bgColor)}>
-        <div className="relative w-full h-full flex items-center justify-center z-20">
+    <div className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] flex flex-col md:flex-row min-h-[500px] md:min-h-[550px] border border-slate-200/50 shadow-xl">
+      <div className={cn("w-full md:w-[45%] min-h-[350px] md:h-full relative z-30 flex flex-col items-start justify-center overflow-hidden px-8 md:px-12 py-10", bgColor)}>
+        <div className="relative w-full h-full flex items-center justify-center md:justify-start z-20">
           {features.map((feature, index) => {
             const isActive = index === currentIndex;
             const distance = index - currentIndex;
@@ -231,7 +717,10 @@ function FeatureCarouselSection({ features, theme = "light" }) {
             return (
               <motion.div
                 key={feature.id}
-                style={{ height: ITEM_HEIGHT, width: "fit-content" }}
+                style={{
+                  height: ITEM_HEIGHT,
+                  width: "fit-content",
+                }}
                 animate={{
                   y: wrappedDistance * ITEM_HEIGHT,
                   opacity: 1 - Math.abs(wrappedDistance) * 0.25,
@@ -242,21 +731,23 @@ function FeatureCarouselSection({ features, theme = "light" }) {
                   damping: 22,
                   mass: 1,
                 }}
-                className="absolute flex items-center justify-start"
+                className="absolute flex items-center justify-start md:justify-start"
               >
                 <button
                   onClick={() => handleChipClick(index)}
                   onMouseEnter={() => setIsPaused(true)}
                   onMouseLeave={() => setIsPaused(false)}
                   className={cn(
-                    "relative flex items-center gap-4 px-6 md:px-8 py-3 rounded-full transition-all duration-700 text-left group border",
-                    isActive ? chipActiveBg : chipInactiveBg
+                    "relative flex items-center gap-4 px-8 py-4 rounded-full transition-all duration-700 text-left group border",
+                    isActive
+                      ? "bg-white text-blue-500 border-white z-10 shadow-lg"
+                      : "bg-transparent text-white/60 border-white/20 hover:border-white/40 hover:text-white"
                   )}
                 >
                   <div className={cn("flex items-center justify-center transition-colors duration-500", isActive ? iconActiveColor : iconInactiveColor)}>
-                    <feature.icon size={18} strokeWidth={2} />
+                    <feature.icon size={20} strokeWidth={2} />
                   </div>
-                  <span className="font-medium text-sm md:text-[15px] tracking-tight whitespace-nowrap">
+                  <span className="font-medium text-base tracking-tight whitespace-nowrap">
                     {feature.label}
                   </span>
                 </button>
@@ -266,8 +757,8 @@ function FeatureCarouselSection({ features, theme = "light" }) {
         </div>
       </div>
 
-      <div className={cn("w-full min-h-[300px] md:min-h-[400px] relative flex items-center justify-center overflow-hidden", isDark ? "bg-slate-800/50" : "bg-slate-50")}>
-        <div className="relative w-full max-w-[500px] aspect-[4/3] flex items-center justify-center">
+      <div className={cn("flex-1 min-h-[400px] md:h-full relative flex items-center justify-center py-10 md:py-12 px-6 md:px-10 overflow-hidden", isDark ? "bg-slate-800/50" : "bg-slate-50")}>
+        <div className="relative w-full max-w-[420px] aspect-[4/5] flex items-center justify-center">
           {features.map((feature, index) => {
             const status = getCardStatus(index);
             const isActive = status === "active";
@@ -292,12 +783,12 @@ function FeatureCarouselSection({ features, theme = "light" }) {
                   damping: 25,
                   mass: 0.8,
                 }}
-                className="absolute inset-0 rounded-xl md:rounded-2xl overflow-hidden border-4 md:border-6 bg-background origin-center"
+                className="absolute inset-0 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border-4 md:border-6 bg-background origin-center"
               >
                 <img
                   src={feature.image}
                   alt={feature.label}
-                  className={cn("w-full h-full object-cover transition-all duration-700", isActive ? "" : "grayscale blur-[2px] brightness-75")}
+                  className={cn("w-full h-full object-cover transition-all duration-700", isActive ? "grayscale-0" : "grayscale blur-[2px] brightness-75")}
                 />
                 <AnimatePresence>
                   {isActive && (
@@ -307,7 +798,7 @@ function FeatureCarouselSection({ features, theme = "light" }) {
                       exit={{ opacity: 0, y: 10 }}
                       className="absolute inset-x-0 bottom-0 p-10 pt-32 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end pointer-events-none"
                     >
-                      <div className={cn("px-4 py-1.5 rounded-full text-[11px] font-normal uppercase tracking-[0.2em] w-fit shadow-lg mb-3 border border-border/50", headerBg)}>
+                      <div className={cn("px-4 py-1.5 rounded-full text-[11px] font-normal uppercase tracking-[0.2em] w-fit shadow-lg mb-3 border border-border/50", isDark ? "bg-white/10 border-white/20 text-white/80" : "bg-white border border-slate-200 text-slate-600")}>
                         {index + 1} • {feature.label}
                       </div>
                       <p className="text-white font-normal text-xl md:text-2xl leading-tight drop-shadow-md tracking-tight">
@@ -471,8 +962,8 @@ const MagnifiedBento = () => {
             </motion.div>
           </div>
 
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-slate-50 to-transparent z-20"></div>
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-slate-50 to-transparent z-20"></div>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-white to-transparent z-20"></div>
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white to-transparent z-20"></div>
     </div>
   );
 };
@@ -552,7 +1043,7 @@ const HeroRobotAvatar = () => {
   const triggerRandomExpression = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * expressionList.length);
     setCurrentExpression(expressionList[randomIndex]);
-    setTimeout(() => setCurrentExpression('default_loop'), 2000);
+    setTimeout(() => setCurrentExpression('default_loop'), 5000);
   }, []);
 
   useEffect(() => {
@@ -675,10 +1166,6 @@ const HeroRobotAvatar = () => {
         const isSelected = hoveredFeature === feature.label;
         
         const handleClick = () => {
-          if (!isSelected) {
-            const targetAngle = (index / orbitalFeatures.length) * 360;
-            setRotationAngle(270 - targetAngle);
-          }
           setHoveredFeature(isSelected ? null : feature.label);
           triggerRandomExpression();
         };
@@ -708,13 +1195,21 @@ const HeroRobotAvatar = () => {
 
               {/* Chat Popup Modal */}
               <AnimatePresence>
-                {isSelected && (
+                {isSelected && (() => {
+                  const angle = (index / orbitalFeatures.length) * 360 + rotationAngle;
+                  const rad = angle * (Math.PI / 180);
+                  const isLeft = Math.cos(rad) < 0;
+                  
+                  return (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.9, x: -20 }}
+                    initial={{ opacity: 0, scale: 0.9, x: isLeft ? 20 : -20 }}
                     animate={{ opacity: 1, scale: 1, x: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, x: -20 }}
+                    exit={{ opacity: 0, scale: 0.9, x: isLeft ? 20 : -20 }}
                     transition={{ duration: 0.25, ease: "easeOut" }}
-                    className="absolute right-full mr-4 top-1/2 -translate-y-1/2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
+                    className={cn(
+                      "absolute top-1/2 -translate-y-1/2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden",
+                      isLeft ? "left-full ml-4" : "right-full mr-4"
+                    )}
                     style={{ zIndex: 1000 }}
                   >
                     {/* Chat Header */}
@@ -778,7 +1273,8 @@ const HeroRobotAvatar = () => {
                       </div>
                     </div>
                   </motion.div>
-                )}
+                  );
+                })()}
               </AnimatePresence>
             </div>
           </div>
@@ -787,12 +1283,13 @@ const HeroRobotAvatar = () => {
 
       {/* Center Avatar */}
       <motion.div 
-        className="relative z-10 flex items-center justify-center w-[440px] h-[330px] cursor-pointer"
+        className="relative z-10 flex items-center justify-center w-[320px] h-[240px] cursor-pointer select-none"
+        style={{ userSelect: 'none' }}
         animate={{ x: mousePos.x, y: mousePos.y - 15 }} 
         transition={{ type: "spring", stiffness: 250, damping: 20 }}
         onClick={triggerRandomExpression}
       >
-        <Esp32Face frame={frame} expressionId={currentExpression} />
+        <Face expId={currentExpression} mouth={evalKf(DEFAULT_ANIMS.default_loop, frame)?.mouth || [188, 126, 188, 126, 183.772, 150, 160, 150, 136.228, 150, 132, 126, 132, 126]} frame={frame} animated={true} size={320} />
       </motion.div>
     </motion.div>
   );
@@ -960,6 +1457,196 @@ export function FeatureCarousel({ features, theme = "light" }) {
   );
 }
 
+// --- Spatial Product Showcase Component (新版：左边同心圆Face，右边展开卡片) ---
+function SpatialProductShowcase({ features, mode = 'tourist' }) {
+  const [activeIndex, setActiveIndex] = useState(null);
+  const [frame, setFrame] = useState(0);
+  const [currentExpression, setCurrentExpression] = useState('default_loop');
+  const isTourist = mode === 'tourist';
+
+  const expressionList = ['default_loop', 'talking', 'open_eye', 'very_happy', 'happy_wink', 'sad', 'angry', 'sleep', 'question'];
+
+  useEffect(() => {
+    let timer = setInterval(() => {
+      setFrame(f => (f + 1) % LOOP_F);
+    }, 1000 / 30);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * expressionList.length);
+      setCurrentExpression(expressionList[randomIndex]);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="w-full">
+      <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+        {/* 左侧：简洁的 Face 展示 */}
+        <motion.div 
+          key={mode + '-left'}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="w-full lg:w-auto flex-shrink-0"
+        >
+          <div className={cn(
+            "relative w-72 h-72 mx-auto",
+            "flex items-center justify-center"
+          )}>
+            {/* 柔和的光晕背景 */}
+            <motion.div
+              animate={{ scale: [1, 1.05, 1], opacity: [0.4, 0.6, 0.4] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className={cn(
+                "absolute inset-0 rounded-full blur-3xl",
+                isTourist ? "bg-blue-400/20" : "bg-green-400/20"
+              )}
+            />
+            
+            {/* 玻璃质感圆环 */}
+            <div className={cn(
+              "absolute inset-0 rounded-full border-2 backdrop-blur-sm",
+              isTourist 
+                ? "bg-blue-50/30 border-blue-200/50" 
+                : "bg-green-50/30 border-green-200/50"
+            )} />
+
+            {/* Face */}
+            <motion.div
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Face 
+                expId={currentExpression}
+                mouth={evalKf(DEFAULT_ANIMS[currentExpression], frame)?.mouth}
+                frame={frame}
+                size={200}
+                animated={true}
+              />
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* 右侧：卡片网格 */}
+        <motion.div 
+          key={mode + '-right'}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex-1 w-full"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.08, duration: 0.4 }}
+                onClick={() => setActiveIndex(activeIndex === index ? null : index)}
+                className={cn(
+                  "group relative rounded-2xl cursor-pointer transition-all duration-300 overflow-hidden",
+                  activeIndex === index
+                    ? cn(
+                        isTourist ? "ring-2 ring-blue-400 shadow-xl shadow-blue-100/50" : "ring-2 ring-green-400 shadow-xl shadow-green-100/50",
+                        "bg-white"
+                      )
+                    : "bg-slate-50/80 hover:bg-white border border-slate-200/60 hover:border-slate-300 hover:shadow-lg"
+                )}
+              >
+                {/* 顶部装饰条 */}
+                <div className={cn(
+                  "h-1 w-full transition-all duration-300",
+                  activeIndex === index
+                    ? isTourist ? "bg-gradient-to-r from-blue-400 to-blue-600" : "bg-gradient-to-r from-green-400 to-green-600"
+                    : "bg-transparent group-hover:bg-slate-200"
+                )} />
+                
+                <div className="p-5">
+                  {/* 图标和标题 */}
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className={cn(
+                      "w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300",
+                      activeIndex === index
+                        ? isTourist ? "bg-blue-500 text-white shadow-lg shadow-blue-200" : "bg-green-500 text-white shadow-lg shadow-green-200"
+                        : isTourist 
+                          ? "bg-blue-100 text-blue-600 group-hover:bg-blue-200" 
+                          : "bg-green-100 text-green-600 group-hover:bg-green-200"
+                    )}>
+                      <feature.icon size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0 pt-1">
+                      <h4 className={cn(
+                        "font-semibold text-[15px] leading-tight mb-0.5",
+                        activeIndex === index 
+                          ? isTourist ? "text-blue-700" : "text-green-700"
+                          : "text-slate-800"
+                      )}>
+                        {feature.label}
+                      </h4>
+                      <p className="text-xs text-slate-500 leading-relaxed">{feature.description}</p>
+                    </div>
+                  </div>
+
+                  {/* 展开的图片 */}
+                  <AnimatePresence>
+                    {activeIndex === index && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="relative aspect-[16/10] rounded-xl overflow-hidden mb-3">
+                          <img 
+                            src={feature.image} 
+                            alt={feature.label}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className={cn(
+                            "absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"
+                          )} />
+                          <div className="absolute bottom-2.5 left-3">
+                            <span className={cn(
+                              "px-2.5 py-1 rounded-full text-[11px] font-medium text-white backdrop-blur-sm",
+                              isTourist ? "bg-blue-500/90" : "bg-green-500/90"
+                            )}>
+                              {feature.label}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* 详细描述 */}
+                        <p className="text-sm text-slate-600 leading-relaxed px-0.5">
+                          {feature.description}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* 点击提示 */}
+                  {!activeIndex && (
+                    <div className={cn(
+                      "text-xs font-medium transition-colors duration-200 mt-2",
+                      isTourist ? "text-blue-500/70" : "text-green-500/70",
+                      "group-hover:text-blue-500/90"
+                    )}>
+                      点击查看详情 →
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
 const TabsContext = React.createContext();
 
 const Tabs = ({ value, onValueChange, children }) => (
@@ -1111,12 +1798,77 @@ export function PillMorphTabs({ items = [], defaultValue, onValueChange, classNa
 
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeTab, setActiveTab] = useState('tourist');
+  const [selectedCase, setSelectedCase] = useState(0);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const scrollRef1 = useRef(null);
+  const scrollRef2 = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = selectedCard ? 'hidden' : 'unset';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [selectedCard]);
+
+  const useSmoothHorizontalScroll = (ref) => {
+    useEffect(() => {
+      const el = ref.current;
+      if (!el) return;
+
+      let isAnimating = false;
+      let targetDelta = 0;
+      let animationFrameId;
+
+      const lerp = (start, end, factor) => start + (end - start) * factor;
+
+      const update = () => {
+        if (Math.abs(targetDelta) > 0.5) {
+          const step = lerp(0, targetDelta, 0.06); 
+          el.scrollBy({ left: step, behavior: 'auto' });
+          targetDelta -= step;
+          animationFrameId = requestAnimationFrame(update);
+        } else {
+          targetDelta = 0;
+          isAnimating = false;
+        }
+      };
+
+      const handleWheel = (e) => {
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; 
+        if (e.deltaY === 0) return;
+
+        const maxScrollLeft = el.scrollWidth - el.clientWidth;
+        const currentScroll = Math.abs(Math.round(el.scrollLeft));
+        const isRtl = getComputedStyle(el).direction === 'rtl';
+
+        if ((e.deltaY > 0 && currentScroll < maxScrollLeft - 2) || (e.deltaY < 0 && currentScroll > 2)) {
+            e.preventDefault();
+            const multiplier = isRtl ? -2 : 2; 
+            targetDelta += e.deltaY * multiplier;
+            targetDelta = Math.max(-1200, Math.min(1200, targetDelta));
+
+            if (!isAnimating) {
+              isAnimating = true;
+              animationFrameId = requestAnimationFrame(update);
+            }
+        }
+      };
+
+      el.addEventListener('wheel', handleWheel, { passive: false });
+      return () => {
+        el.removeEventListener('wheel', handleWheel);
+        cancelAnimationFrame(animationFrameId);
+      };
+    }, [ref]);
+  };
+
+  useSmoothHorizontalScroll(scrollRef1);
+  useSmoothHorizontalScroll(scrollRef2);
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] text-slate-800 font-sans selection:bg-blue-100 selection:text-blue-900 relative overflow-x-hidden">
@@ -1132,9 +1884,9 @@ export default function App() {
             <img src="/logo.png" alt="NIANXX" className="h-7" />
           </div>
           
-          <div className={`hidden md:flex items-center gap-2 ${isScrolled ? '' : 'bg-white/50 backdrop-blur-md rounded-full px-4 border border-white/60 shadow-sm'}`}>
+          <div className={`hidden md:flex items-center gap-2 ${isScrolled ? '' : 'bg-white/50 backdrop-blur-md rounded-full px-2 border border-white/60 shadow-sm'}`}>
             {['解决方案', '产品功能', '落地案例'].map((item) => (
-              <a key={item} href={`#${item}`} className="px-5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-black/5 rounded-full transition-colors">
+              <a key={item} href={`#${item}`} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-black/5 rounded-full transition-colors">
                 {item}
               </a>
             ))}
@@ -1147,11 +1899,15 @@ export default function App() {
       </div>
 
       {/* --- Section 1: Hero (Animated Face) --- */}
-      <section className="relative min-h-[90vh] pt-40 pb-20 flex items-center justify-center overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-blue-100/80 via-cyan-50/50 to-fuchsia-50/50 rounded-full blur-[100px] pointer-events-none z-0"></div>
-
+      <AuroraBackground className="min-h-[90vh] pt-40 pb-32">
         <div className="max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-12 gap-12 items-center relative z-10">
-          <div className="lg:col-span-6 flex flex-col items-start pt-10">
+          <motion.div 
+            className="lg:col-span-6 flex flex-col items-start pt-10"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
+            viewport={{ once: true }}
+          >
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200/60 shadow-sm text-slate-500 text-xs font-semibold mb-8 uppercase tracking-widest">
               <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
               基于酒店 / 景区 / 目的地
@@ -1171,16 +1927,22 @@ export default function App() {
               <GlowButton primary>查看产品体系 <ArrowRight size={16} /></GlowButton>
               <GlowButton>了解合作方式</GlowButton>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="lg:col-span-6 h-[600px] relative hidden lg:flex items-center justify-center scale-100 origin-center">
+          <motion.div 
+            className="lg:col-span-6 h-[600px] relative hidden lg:flex items-center justify-center scale-100 origin-center"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8, ease: "easeInOut" }}
+            viewport={{ once: true }}
+          >
              <HeroRobotAvatar />
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </AuroraBackground>
 
       {/* --- Section 2: 市场洞察 --- */}
-      <section className="py-24 relative z-10 border-t border-slate-100 bg-slate-50/50">
+      <section className="py-24 relative z-10 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col gap-12 mb-24">
             <div className="text-center max-w-2xl mx-auto">
@@ -1222,173 +1984,526 @@ export default function App() {
         </div>
       </section>
 
-      {/* --- Section 3: 解决方案 --- */}
-      <section id="解决方案" className="py-32 relative z-10">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-24">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">以服务重塑信任。</h2>
-            <p className="text-xl text-slate-500 font-light mb-12">为每一个目的地，打造私有 AI 智能体。</p>
+      {/* --- Section 3: 私有核心资产 (Light Nexus) --- */}
+      <ConceptLightNexus />
 
-            <div className="grid md:grid-cols-3 gap-6 auto-rows-[280px]">
-              <SurfaceCard delay={0} className="md:col-span-2 row-span-2 flex flex-col justify-between group !p-10 md:!p-12">
-                 <div className="absolute -right-20 -top-20 w-[400px] h-[400px] bg-blue-100/50 rounded-full blur-[80px] pointer-events-none"></div>
-                 <div>
-                   <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center mb-8"><ShieldCheck size={20} className="text-blue-600"/></div>
-                   <h3 className="text-3xl font-bold text-slate-900 mb-6">私有核心资产</h3>
-                   <div className="grid sm:grid-cols-2 gap-4">
-                     {['平台是自己的', '品牌是自己的', '游客关系是自己的', '数据主权是自己的'].map(item => (
-                       <div key={item} className="flex items-center gap-3 text-slate-600 font-medium bg-white/60 py-2.5 px-4 rounded-xl border border-white">
-                         <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span> {item}
-                       </div>
-                     ))}
-                   </div>
-                 </div>
-                 <p className="mt-8 text-slate-500 text-sm leading-relaxed max-w-md relative z-10">游客接触到的，是目的地专属的智能助手。它负责问答、导览、推荐、预约与转化，持续连接服务与交易。</p>
-              </SurfaceCard>
+      {/* --- Section 3.5: 信任驱动消费 (Feature Rows) --- */}
+      <section className="py-16 lg:py-20 relative z-10 bg-white">
+        <div className="max-w-[1200px] mx-auto px-6">
+          {/* Header */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-500 font-semibold text-[13px] mb-6 border border-blue-100">
+              <Sparkles size={12} className="mr-1.5" /> 消费闭环
+            </span>
+            <h3 className="text-[44px] md:text-[56px] font-extrabold leading-tight text-slate-900 mb-6 tracking-tight">信任驱动消费，服务连接一切。</h3>
+            <p className="text-[18px] md:text-[20px] text-slate-500 max-w-2xl mx-auto">从需求到交易，AI 智能体全程陪伴，构建完整的旅游服务生态。</p>
+          </motion.div>
 
-              <SurfaceCard delay={100} className="flex flex-col">
-                 <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-6 shrink-0"><Settings size={18} className="text-slate-700"/></div>
-                 <h3 className="text-xl font-bold text-slate-900 mb-3">专属 AI 定制</h3>
-                 <p className="text-slate-500 font-light text-sm">深度融合品牌特征与业务逻辑，快速完成私有化部署。</p>
-              </SurfaceCard>
+          {/* Feature Rows Container */}
+          <div className="relative w-full">
+            {/* Center Timeline Axis */}
+            <div className="absolute left-1/2 top-[5%] bottom-[5%] w-px border-l border-dashed border-slate-200 -translate-x-1/2 hidden lg:block z-0" />
 
-              <SurfaceCard delay={200} className="flex flex-col">
-                 <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-6 shrink-0"><Map size={18} className="text-slate-700"/></div>
-                 <h3 className="text-xl font-bold text-slate-900 mb-3">本地数据知识</h3>
-                 <p className="text-slate-500 font-light text-sm">本地团队持续标注，让 AI 像原住民一样理解目的地的空间与细节。</p>
-              </SurfaceCard>
-            </div>
-
-            <div className="mt-24">
-              <div className="mb-12">
-                <h3 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-3">服务先行，消费自然发生。</h3>
-                <p className="text-lg text-slate-500 font-light">服务越自然，消费越顺畅。</p>
+            {/* Row 1: 资讯 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="relative flex flex-col lg:flex-row items-center justify-between w-full mb-20 group"
+            >
+              {/* Center Node */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
+                <div className="absolute w-12 h-12 rounded-full bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-blue-500 group-hover:border-blue-100">
+                  01
+                </div>
               </div>
 
-              <p className="text-slate-600 text-lg font-light mb-12 max-w-3xl">帮助目的地销售的，不只是自己的商品，而是整个目的地的行中消费：</p>
-
-              <div className="grid md:grid-cols-3 gap-8">
-                <SurfaceCard delay={0} className="!bg-gradient-to-br !from-blue-50 !to-blue-100/30 border-blue-200/50">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-200/50 flex items-center justify-center">
-                      <Building size={18} className="text-blue-600"/>
-                    </div>
-                    <span className="text-blue-600 font-bold text-sm uppercase tracking-wider">第一层</span>
-                  </div>
-                  <h4 className="text-xl font-bold text-slate-900 mb-4">目的地自营</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {['客房升级', '餐饮', '纪念品', '门票加购', '园区二销', '增值服务'].map(item => (
-                      <span key={item} className="px-3 py-1.5 bg-white/80 rounded-full text-slate-600 text-sm font-medium border border-slate-200">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </SurfaceCard>
-
-                <SurfaceCard delay={100} className="!bg-gradient-to-br !from-green-50 !to-green-100/30 border-green-200/50">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-200/50 flex items-center justify-center">
-                      <Store size={18} className="text-green-600"/>
-                    </div>
-                    <span className="text-green-600 font-bold text-sm uppercase tracking-wider">第二层</span>
-                  </div>
-                  <h4 className="text-xl font-bold text-slate-900 mb-4">本地全品类</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {['周边餐厅', '咖啡', '交通接驳', '租车', '本地特产', '周边景点'].map(item => (
-                      <span key={item} className="px-3 py-1.5 bg-white/80 rounded-full text-slate-600 text-sm font-medium border border-slate-200">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </SurfaceCard>
-
-                <SurfaceCard delay={200} className="!bg-gradient-to-br !from-amber-50 !to-amber-100/30 border-amber-200/50">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-200/50 flex items-center justify-center">
-                      <Sparkles size={18} className="text-amber-600"/>
-                    </div>
-                    <span className="text-amber-600 font-bold text-sm uppercase tracking-wider">第三层</span>
-                  </div>
-                  <h4 className="text-xl font-bold text-slate-900 mb-4">新体验经济</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {['非遗体验', '手工课程', '徒步', '私人导览', '农场体验', '民俗活动'].map(item => (
-                      <span key={item} className="px-3 py-1.5 bg-white/80 rounded-full text-slate-600 text-sm font-medium border border-slate-200">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </SurfaceCard>
+              {/* Image Area */}
+              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pr-8 lg:pl-4">
+                <GraphicOne />
               </div>
 
-              <p className="text-slate-500 text-base font-light mt-8 text-center">等本地特色供给</p>
-            </div>
+              {/* Text Area */}
+              <div className="w-full lg:w-[45%] lg:pl-8">
+                <div className="flex items-center mb-3">
+                  <span className="text-[12px] font-bold tracking-widest uppercase text-blue-400">
+                    服务构建信任
+                  </span>
+                  <div className="h-px w-8 bg-blue-100 ml-4" />
+                </div>
+                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">资讯获取</h4>
+                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
+                  整合实时运营状态与口碑数据，智能推荐最适合游客的景点与体验，提供无缝预订服务。
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
+                    景点推荐
+                  </div>
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
+                    实时数据
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Row 2: 呼叫响应 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="relative flex flex-col lg:flex-row-reverse items-center justify-between w-full mb-20 group"
+            >
+              {/* Center Node */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
+                <div className="absolute w-12 h-12 rounded-full bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-blue-500 group-hover:border-blue-100">
+                  02
+                </div>
+              </div>
+
+              {/* Image Area */}
+              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pl-8">
+                <GraphicTwo />
+              </div>
+
+              {/* Text Area */}
+              <div className="w-full lg:w-[45%] lg:pr-8">
+                <div className="flex items-center mb-3">
+                  <span className="text-[12px] font-bold tracking-widest uppercase text-blue-400">
+                    服务构建信任
+                  </span>
+                  <div className="h-px w-8 bg-blue-100 ml-4" />
+                </div>
+                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">呼叫响应</h4>
+                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
+                  自然语音交互，随时响应延迟退房、活动报名等即时需求，让贴心服务始终零距离。
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
+                    24/7响应
+                  </div>
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
+                    即时需求
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Row 3: 需求感知 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="relative flex flex-col lg:flex-row items-center justify-between w-full mb-20 group"
+            >
+              {/* Center Node */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
+                <div className="absolute w-12 h-12 rounded-full bg-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-blue-500 group-hover:border-blue-100">
+                  03
+                </div>
+              </div>
+
+              {/* Image Area */}
+              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pr-8 lg:pl-4">
+                <GraphicThree />
+              </div>
+
+              {/* Text Area */}
+              <div className="w-full lg:w-[45%] lg:pl-8">
+                <div className="flex items-center mb-3">
+                  <span className="text-[12px] font-bold tracking-widest uppercase text-blue-400">
+                    服务构建信任
+                  </span>
+                  <div className="h-px w-8 bg-blue-100 ml-4" />
+                </div>
+                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">需求感知</h4>
+                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
+                  持续感知游客偏好，智能收集并分析个性化需求，前置性地提供定制化服务建议。
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
+                    个性化
+                  </div>
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
+                    深度分析
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Row 4: 全程伴游 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true }}
+              className="relative flex flex-col lg:flex-row-reverse items-center justify-between w-full mb-20 group"
+            >
+              {/* Center Node */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
+                <div className="absolute w-12 h-12 rounded-full bg-green-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-green-600 group-hover:border-green-200">
+                  04
+                </div>
+              </div>
+
+              {/* Image Area */}
+              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pl-8">
+                <GraphicFour />
+              </div>
+
+              {/* Text Area */}
+              <div className="w-full lg:w-[45%] lg:pr-8">
+                <div className="flex items-center mb-3">
+                  <span className="text-[12px] font-bold tracking-widest uppercase text-green-500">
+                    信任驱动交易
+                  </span>
+                  <div className="h-px w-8 bg-green-100 ml-4" />
+                </div>
+                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">全程伴游</h4>
+                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
+                  专属AI智能体全程陪伴，从接机入网到离境送机，提供无缝衔接的贴心陪伴式体验。
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
+                    全程陪伴
+                  </div>
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
+                    贴心服务
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Row 5: 商品智荐 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="relative flex flex-col lg:flex-row items-center justify-between w-full mb-20 group"
+            >
+              {/* Center Node */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
+                <div className="absolute w-12 h-12 rounded-full bg-green-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-green-600 group-hover:border-green-200">
+                  05
+                </div>
+              </div>
+
+              {/* Image Area */}
+              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pr-8 lg:pl-4">
+                <GraphicFive />
+              </div>
+
+              {/* Text Area */}
+              <div className="w-full lg:w-[45%] lg:pl-8">
+                <div className="flex items-center mb-3">
+                  <span className="text-[12px] font-bold tracking-widest uppercase text-green-500">
+                    信任驱动交易
+                  </span>
+                  <div className="h-px w-8 bg-green-100 ml-4" />
+                </div>
+                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">商品智荐</h4>
+                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
+                  基于游客即时偏好与当下所处场景，智能推荐精选商品，让优质产品主动找到目标客户。
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
+                    精选推荐
+                  </div>
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
+                    智能匹配
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Row 6: 一站式预约 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              viewport={{ once: true }}
+              className="relative flex flex-col lg:flex-row-reverse items-center justify-between w-full group"
+            >
+              {/* Center Node */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
+                <div className="absolute w-12 h-12 rounded-full bg-green-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-green-600 group-hover:border-green-200">
+                  06
+                </div>
+              </div>
+
+              {/* Image Area */}
+              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pl-8">
+                <GraphicSix />
+              </div>
+
+              {/* Text Area */}
+              <div className="w-full lg:w-[45%] lg:pr-8">
+                <div className="flex items-center mb-3">
+                  <span className="text-[12px] font-bold tracking-widest uppercase text-green-500">
+                    信任驱动交易
+                  </span>
+                  <div className="h-px w-8 bg-green-100 ml-4" />
+                </div>
+                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">一站式预约</h4>
+                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
+                  打破业务孤岛，整合目的地所有服务资源，一站式完成门票、餐饮、住宿等全部预约需求。
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
+                    一站式
+                  </div>
+                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
+                    全流程
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* --- Section 4: 产品功能 (Feature108 Style) --- */}
-      <section id="产品功能" className="py-32 relative z-10">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col items-center gap-6 text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold">
-              <Sparkles size={12} /> 产品功能
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">一个智能体，两幅面孔。</h2>
-            <p className="text-lg text-slate-500 font-light max-w-2xl">对外伴游，对内赋能。不仅是单点工具，更是完整商业系统。</p>
-          </div>
-
-          {/* 游客看见什么 */}
-          <div className="mb-16">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">游客看见什么</h3>
-              <p className="text-slate-500 max-w-xl mx-auto">对外伴游，让每一位游客享受专属服务体验</p>
-            </div>
-            <FeatureCarouselSection 
-              features={TOURIST_FEATURES} 
-              theme="light" 
-            />
-          </div>
-
-          {/* 内部看见什么 */}
-          <div>
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">内部看见什么</h3>
-              <p className="text-slate-500 max-w-xl mx-auto">对内赋能，让运营效率提升数倍</p>
-            </div>
-            <FeatureCarouselSection 
-              features={INTERNAL_FEATURES} 
-              theme="dark" 
-            />
-          </div>
+      {/* --- Section 4: 产品功能 (Z-Pattern Horizontal Gallery) --- */}
+      <section id="产品功能" className="py-20 relative z-10 bg-slate-50">
+        <div className="max-w-[1200px] mx-auto px-6 mb-12">
+          {/* Header */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 font-semibold text-[13px] mb-6 border border-indigo-100">
+              <Sparkles size={12} className="mr-1.5" /> 产品功能
+            </span>
+            <h2 className="text-[44px] md:text-[56px] font-extrabold leading-tight text-slate-900 mb-4 tracking-tight">
+              一个智能体，两副面孔
+            </h2>
+            <p className="text-[18px] text-slate-500 max-w-2xl mx-auto">
+              面向游客的贴心陪伴，面向内部的智能运营，一个智能体，双重价值创造。
+            </p>
+          </motion.div>
         </div>
+
+        {/* Z-Pattern Horizontal Gallery */}
+        <div className="w-full overflow-hidden">
+          
+          {/* Chapter 1: 游客视角 (LTR) */}
+          <div className="relative w-full flex items-center py-12">
+            <div className="absolute pointer-events-none whitespace-nowrap text-[15vw] font-black text-slate-900/5 leading-none select-none top-[20%] font-sans tracking-tighter mix-blend-multiply opacity-50">
+              TOURIST PERSPECTIVE
+            </div>
+            
+            <div 
+              ref={scrollRef1}
+              dir="ltr" 
+              className="relative z-10 w-full flex items-center gap-8 overflow-x-auto hide-scrollbar px-[8vw] py-8"
+            >
+              
+              {/* Intro Card */}
+              <div className="shrink-0 w-[80vw] md:w-[30vw] flex flex-col justify-center">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-600 font-bold text-[11px] mb-4 uppercase tracking-widest w-fit">
+                  Chapter 01
+                </span>
+                <h3 className="text-[38px] md:text-[52px] font-bold text-slate-900 leading-[1.1] tracking-tight">
+                  游客视角<br/>沉浸探索
+                </h3>
+                <p className="text-slate-500 mt-5 text-[15px] md:text-[17px] leading-relaxed max-w-sm">
+                  无微不至的陪伴体验，打破数字与现实的边界，让每一次旅程都充满温度。
+                </p>
+                <div className="mt-8 flex items-center text-slate-400 text-sm font-semibold tracking-wider animate-pulse">
+                   滑动探索 <ArrowRight className="w-4 h-4 ml-2" />
+                </div>
+              </div>
+
+              {/* Tourist Cards */}
+              {TOURIST_CARDS.map(card => (
+                <GalleryCard key={card.id} card={card} onSelect={setSelectedCard} />
+              ))}
+
+              <div className="shrink-0 w-[5vw]"></div>
+            </div>
+          </div>
+
+
+          {/* Z-Axis Transition */}
+          <div className="w-full flex justify-center py-8">
+             <div className="w-px h-20 bg-gradient-to-b from-blue-200 to-transparent"></div>
+          </div>
+
+
+          {/* Chapter 2: 内部视角 (RTL) */}
+          <div className="relative w-full flex items-center pb-16">
+            <div className="absolute pointer-events-none whitespace-nowrap text-[15vw] font-black text-slate-900/5 leading-none select-none top-[20%] font-sans tracking-tighter mix-blend-multiply opacity-50 right-0 transform translate-x-[10%]">
+              INTERNAL PERSPECTIVE
+            </div>
+            
+            <div 
+              ref={scrollRef2}
+              dir="rtl" 
+              className="relative z-10 w-full flex items-center gap-8 overflow-x-auto hide-scrollbar px-[8vw] py-8"
+            >
+              
+              {/* Intro Card */}
+              <div className="shrink-0 w-[80vw] md:w-[30vw] flex flex-col justify-center items-end text-right" dir="ltr">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-600 font-bold text-[11px] mb-4 uppercase tracking-widest w-fit">
+                  Chapter 02
+                </span>
+                <h3 className="text-[38px] md:text-[52px] font-bold text-slate-900 leading-[1.1] tracking-tight">
+                  内部视角<br/>效率革命
+                </h3>
+                <p className="text-slate-500 mt-5 text-[15px] md:text-[17px] leading-relaxed max-w-sm ml-auto">
+                  从繁杂的流程中解脱，让系统自动化接管日常营运与决策辅助。
+                </p>
+                <div className="mt-8 flex items-center text-slate-400 text-sm font-semibold tracking-wider animate-pulse flex-row-reverse">
+                   滑动探索 <ArrowRight className="w-4 h-4 mr-2 transform rotate-180" />
+                </div>
+              </div>
+
+              {/* Internal Cards */}
+              {INTERNAL_CARDS.map(card => (
+                <GalleryCard key={card.id} card={card} onSelect={setSelectedCard} />
+              ))}
+
+              <div className="shrink-0 w-[5vw]"></div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Global Styles for Scroll */}
+        <style>{`
+          .hide-scrollbar::-webkit-scrollbar { display: none; }
+          .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
+
+        {/* Detail Modal */}
+        <DetailModal card={selectedCard} onClose={() => setSelectedCard(null)} />
       </section>
 
       {/* --- Section 5: 落地案例 --- */}
-      <section id="落地案例" className="py-32 relative z-10 border-t border-slate-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 tracking-tight mb-4">落地案例验证。</h2>
-            <p className="text-lg text-slate-500 font-light">首批项目已在贵州落地，覆盖景区、温泉、酒店等，进入真实运营阶段。</p>
+      <section id="落地案例" className="py-32 relative z-10 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-6">落地案例验证</h2>
+            <p className="text-lg text-slate-500 font-light max-w-2xl mx-auto leading-relaxed">首批项目已在贵州落地，覆盖景区、温泉、酒店等，进入真实运营阶段。</p>
           </div>
 
-          <div className="flex overflow-x-auto pb-8 -mx-6 px-6 gap-6 hide-scrollbar snap-x snap-mandatory">
-            {[
-              { name: '荔波小七孔', ai: '七妹智能体', type: '景区' },
-              { name: '凯里下司古镇', ai: '阿糯智能体', type: '古镇' },
-              { name: '息烽天沐温泉', ai: '沐沐智能体', type: '温泉度假区' },
-              { name: '云从朵花酒店', ai: '朵朵智能体', type: '酒店' },
-            ].map((item, i) => (
-              <SurfaceCard key={i} delay={i * 100} className="min-w-[280px] !p-6 group cursor-pointer snap-center shrink-0">
-                <div className="h-40 bg-slate-100 rounded-2xl mb-6 relative overflow-hidden border border-slate-200/50">
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-100 group-hover:scale-105 transition-transform duration-700"></div>
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase text-slate-600 shadow-sm">{item.type}</div>
+          <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
+            {/* 左侧详情 */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedCase}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="relative aspect-square lg:aspect-[4/5] rounded-2xl overflow-hidden border border-slate-200"
+              >
+                <img 
+                  src={CASES[selectedCase].image} 
+                  alt={CASES[selectedCase].name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <span className="px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                    {CASES[selectedCase].type}
+                  </span>
+                  <h3 className="text-2xl font-bold text-white mt-3">{CASES[selectedCase].name}</h3>
+                  <p className="text-sm text-white/80 flex items-center gap-2 mt-1">
+                    <Bot size={14} className="text-blue-400" />
+                    {CASES[selectedCase].ai}
+                  </p>
+                  <p className="text-sm text-white/70 mt-3 leading-relaxed">{CASES[selectedCase].desc}</p>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{item.name}</h3>
-                <div className="text-sm text-slate-500 font-medium flex items-center gap-2">
-                  <Bot size={14} className="text-blue-500"/> {item.ai}
+              </motion.div>
+            </AnimatePresence>
+
+            {/* 右侧卡片列表 */}
+            <div className="flex flex-col gap-3">
+              {CASES.map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1, duration: 0.5 }}
+                  viewport={{ once: true }}
+                  onClick={() => setSelectedCase(i)}
+                  className={cn(
+                    "flex items-center gap-4 p-4 rounded-xl cursor-pointer transition-all duration-300 group",
+                    selectedCase === i 
+                      ? "bg-blue-50 border-2 border-blue-300 shadow-lg" 
+                      : "bg-slate-50 border border-slate-200 hover:border-slate-300 hover:bg-slate-100"
+                  )}
+                >
+                  <div className="flex-1">
+                    <h3 className={cn(
+                      "text-lg font-semibold mb-0.5 transition-colors",
+                      selectedCase === i ? "text-blue-600" : "text-slate-900"
+                    )}>
+                      {item.name}
+                    </h3>
+                    <p className="text-sm text-slate-500">{item.type} · {item.ai}</p>
+                  </div>
+                  {selectedCase === i ? (
+                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-amber-100 shrink-0">
+                      <img 
+                        src={item.image} 
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <ArrowRight size={20} className="text-slate-400 group-hover:text-slate-600 group-hover:translate-x-1 transition-all" />
+                  )}
+                </motion.div>
+              ))}
+
+              {/* 查看全部按钮 */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: CASES.length * 0.1, duration: 0.5 }}
+                viewport={{ once: true }}
+                className="flex items-center gap-4 p-4 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-colors cursor-pointer mt-auto"
+              >
+                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center shrink-0">
+                  <ArrowRight size={18} className="text-white" />
                 </div>
-              </SurfaceCard>
-            ))}
+                <div>
+                  <h3 className="text-base font-semibold text-slate-900">查看全部</h3>
+                  <p className="text-sm text-slate-500">探索更多落地案例</p>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>

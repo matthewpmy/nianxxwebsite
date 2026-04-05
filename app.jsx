@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
-import { 
-  ArrowRight, ArrowUpRight, Map, Settings, ShoppingCart, 
-  Building, Bot, LineChart, Sparkles, MessageSquare, 
+import {
+  ArrowRight, ArrowUpRight, Map, Settings, ShoppingCart,
+  Building, Bot, LineChart, Sparkles, MessageSquare,
   Smartphone, LayoutDashboard, Globe, Layers, Zap, ShieldCheck,
   Utensils, Calendar, Navigation, Store, Clock, Ticket, Baby, Camera, HelpCircle, Coffee,
-  Users, Database, Orbit
+  Users, Database, Orbit, Plus, Fingerprint, Network, Wallet
 } from 'lucide-react';
 import ButtonWithIcon from './components/ui/button-witn-icon';
 import ArrowButton from './components/ui/arrow-button';
@@ -352,154 +352,286 @@ const INTERNAL_FEATURES = [
 ];
 
 // ==========================================
-// 方案 B: 浅色全息枢纽数据字典
+// 私有核心资产数据字典 (code2.md)
 // ==========================================
-const CORE_TITLE = "私有核心资产";
-const METRICS = [
-  { value: "24/7", label: "全天候", icon: Clock },
-  { value: "99.9%", label: "响应速度", icon: Zap },
-  { value: "∞", label: "持续学习", icon: Sparkles },
+
+const PRIVATE_FEATURES = [
+  {
+    id: "01",
+    title: "平台品牌是自己的",
+    desc: "构建完全独立的品牌心智与视觉体系，摆脱平台流量绑架，沉淀高净值私域品牌资产。",
+    icon: Fingerprint,
+    color: "text-blue-500",
+    glowColor: "rgba(59, 130, 246, 0.4)",
+    bg: "bg-blue-500",
+    lightBg: "bg-blue-50",
+    border: "border-blue-200",
+  },
+  {
+    id: "02",
+    title: "服务关系是自己的",
+    desc: "无缝直连每一位游客，建立深度的会员信任体系，所有交互数据与客群关系完全自主掌控。",
+    icon: Network,
+    color: "text-indigo-500",
+    glowColor: "rgba(99, 102, 241, 0.4)",
+    bg: "bg-indigo-500",
+    lightBg: "bg-indigo-50",
+    border: "border-indigo-200",
+  },
+  {
+    id: "03",
+    title: "游客交易是自己的",
+    desc: "打造闭环的自营交易链路，资金流转安全极速，告别高昂平台抽成，实现全域利润最大化。",
+    icon: Wallet,
+    color: "text-emerald-500",
+    glowColor: "rgba(16, 185, 129, 0.4)",
+    bg: "bg-emerald-500",
+    lightBg: "bg-emerald-50",
+    border: "border-emerald-200",
+  }
 ];
 
-const FEATURES = [
-  { id: "platform", title: "平台私有化", desc: "独立部署，数据自主。深度定制、安全可控、灵活扩展。", color: "blue", icon: ShieldCheck },
-  { id: "brand", title: "品牌独立化", desc: "定制IP，形象统一。打造专属品牌形象与用户认知。", color: "indigo", icon: Building },
-  { id: "relationship", title: "关系资产化", desc: "用户关系，深度沉淀。建立持续优化的用户粘性。", color: "emerald", icon: Users },
-  { id: "data", title: "数据自主化", desc: "第一方数据，安全可控。数据驱动精准运营决策。", color: "violet", icon: Database },
-];
-
 // ==========================================
-// 浅色全息枢纽组件
+// 消费闭环 Graphic 组件
 // ==========================================
-const ConceptLightNexus = () => (
-  <section id="解决方案" className="min-h-screen bg-[#f8fafc] overflow-hidden flex items-center justify-center py-24 relative">
-    {/* 浅色网格与环境光 */}
-    <div className="absolute inset-0 opacity-[0.4]" style={{ backgroundImage: 'linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-blue-100/50 rounded-full blur-[100px] pointer-events-none"></div>
 
-    <div className="max-w-[1200px] w-full mx-auto px-6 relative z-10 flex flex-col items-center">
-      
-      {/* 顶部玻璃态 HUD (Data Strip) */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="w-full max-w-4xl bg-white/70 backdrop-blur-xl border border-white rounded-3xl p-6 md:p-8 flex flex-wrap justify-between items-center mb-16 shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
-      >
-         <div className="text-slate-800 pr-8 border-r border-slate-200">
-           <h2 className="text-[28px] font-bold tracking-tight">{CORE_TITLE}</h2>
-           <p className="text-xs text-blue-500 mt-1 uppercase tracking-widest font-semibold">Core Infrastructure</p>
+const GRAPHIC_BG2 = "bg-[#f4f7fb]";
+const GRID_DOTS2 = "radial-gradient(#cbd5e1 1px, transparent 1px)";
+const SOFT_SHADOW2 = "shadow-[0_20px_40px_rgba(0,0,0,0.03),0_1px_3px_rgba(0,0,0,0.02)]";
+const FLOATING_SHADOW2 = "shadow-[0_30px_60px_rgba(14,165,233,0.05),0_4px_10px_rgba(0,0,0,0.02)]";
+
+const GraphicArrival = () => (
+  <div className={`relative w-full aspect-[16/10] ${GRAPHIC_BG2} rounded-[2rem] flex items-center justify-center overflow-hidden`}>
+    <div className="absolute inset-0" style={{ backgroundImage: GRID_DOTS2, backgroundSize: '24px 24px', opacity: 0.5 }}></div>
+    <div className="absolute w-[50%] h-[80%] bg-white/40 rounded-[2rem] border border-white/50 backdrop-blur-sm -translate-y-4"></div>
+    <div className={`relative z-10 w-[65%] bg-white/95 backdrop-blur-xl rounded-2xl border border-white ${FLOATING_SHADOW2} flex flex-col overflow-hidden transition-transform duration-700 hover:-translate-y-2`}>
+      <div className="h-8 bg-blue-50/50 border-b border-slate-50 flex items-center px-4 gap-2">
+        <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
+        <div className="w-12 h-1.5 bg-blue-200 rounded-full"></div>
+      </div>
+      <div className="p-5 flex flex-col gap-4">
+        <div className="flex gap-3 w-[90%]">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-300 to-blue-500 shrink-0 shadow-inner flex items-center justify-center">
+             <div className="w-3 h-3 bg-white rounded-full"></div>
+          </div>
+          <div className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl rounded-tl-sm p-3.5 space-y-2.5 shadow-sm">
+             <div className="w-1/3 h-2 bg-slate-300 rounded-full"></div>
+             <div className="w-[90%] h-1.5 bg-slate-200 rounded-full"></div>
+             <div className="w-[70%] h-1.5 bg-slate-200 rounded-full"></div>
+             <div className="mt-2 pt-2 border-t border-slate-200/60 flex gap-2">
+               <div className="w-12 h-5 bg-white border border-slate-200 rounded-md"></div>
+               <div className="w-16 h-5 bg-blue-50 border border-blue-100 rounded-md"></div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const GraphicDestination = () => (
+  <div className={`relative w-full aspect-[16/10] ${GRAPHIC_BG2} rounded-[2rem] flex items-center justify-center overflow-hidden`}>
+    <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '100% 32px', opacity: 0.3 }}></div>
+    <div className={`absolute z-10 left-[15%] w-40 h-40 bg-white rounded-full border border-white ${FLOATING_SHADOW2} flex items-center justify-center transition-transform duration-700 hover:scale-105`}>
+      <div className="absolute w-[130%] h-[130%] border border-blue-100 rounded-full animate-[spin_10s_linear_infinite]"></div>
+      <div className="absolute w-[160%] h-[160%] border border-slate-100 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+      <div className="flex items-center justify-center gap-1">
+        <div className="w-1.5 h-6 bg-slate-200 rounded-full"></div>
+        <div className="w-1.5 h-10 bg-blue-200 rounded-full"></div>
+        <div className="w-1.5 h-14 bg-blue-400 rounded-full"></div>
+        <div className="w-1.5 h-8 bg-blue-200 rounded-full"></div>
+      </div>
+    </div>
+    <div className={`absolute z-20 right-[15%] w-[45%] h-[65%] bg-white/95 backdrop-blur-md rounded-xl border border-slate-100 ${SOFT_SHADOW2} p-4 flex flex-col justify-between transform translate-y-4 hover:-translate-y-1 transition-transform duration-500`}>
+       <div className="flex justify-between items-start mb-4">
+          <div className="space-y-2 w-full">
+            <div className="w-1/2 h-2.5 bg-slate-800/10 rounded-full"></div>
+            <div className="w-1/3 h-2 bg-slate-200 rounded-full"></div>
+          </div>
+          <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100">
+             <div className="w-3 h-3 bg-blue-400 rounded-sm"></div>
+          </div>
+       </div>
+       <div className="space-y-2">
+         <div className="w-full h-8 bg-slate-50 rounded-md border border-slate-100 flex items-center px-2 gap-2">
+            <div className="w-2 h-2 rounded-full bg-green-400"></div>
+            <div className="w-1/2 h-1.5 bg-slate-300 rounded-full"></div>
          </div>
-         <div className="flex flex-1 justify-around pl-4">
-           {METRICS.map((m, i) => (
-             <motion.div 
-               key={i} 
-               initial={{ opacity: 0, y: 20 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               transition={{ duration: 0.5, delay: i * 0.1 }}
-               viewport={{ once: true }}
-               className="flex flex-col items-center"
-             >
-                <span className="text-[28px] md:text-[32px] font-extrabold text-slate-800">{m.value}</span>
-                <span className="text-[11px] text-slate-500 uppercase tracking-widest mt-1 flex items-center gap-1 font-medium"><m.icon className="w-3.5 h-3.5 text-blue-400"/> {m.label}</span>
-             </motion.div>
-           ))}
+         <div className="w-full h-8 bg-slate-50 rounded-md border border-slate-100 flex items-center px-2 gap-2">
+            <div className="w-2 h-2 rounded-full bg-slate-300"></div>
+            <div className="w-1/3 h-1.5 bg-slate-200 rounded-full"></div>
          </div>
-      </motion.div>
+       </div>
+    </div>
+  </div>
+);
 
-      {/* 中心能量枢纽布局 */}
-      <div className="relative w-full max-w-5xl aspect-[4/3] md:aspect-auto md:min-h-[600px] mt-10 flex items-center justify-center">
-         
-         {/* 发光中心球 (Light Core) */}
-         <motion.div 
-           initial={{ scale: 0, opacity: 0 }}
-           whileInView={{ scale: 1, opacity: 1 }}
-           transition={{ duration: 0.8, delay: 0.3 }}
-           viewport={{ once: true }}
-           className="w-40 h-40 md:w-48 md:h-48 bg-gradient-to-br from-white to-blue-50 rounded-full flex items-center justify-center shadow-[0_0_80px_rgba(59,130,246,0.2),inset_0_10px_20px_rgba(255,255,255,1)] z-20 border-4 border-white animate-[pulse_4s_ease-in-out_infinite] shrink-0"
-         >
-            <Orbit className="w-14 h-14 md:w-16 md:h-16 text-blue-500" strokeWidth={1.5} />
-            <div className="absolute inset-0 rounded-full border-2 border-blue-100 animate-ping"></div>
-         </motion.div>
+const GraphicExploration = () => (
+  <div className={`relative w-full aspect-[16/10] ${GRAPHIC_BG2} rounded-[2rem] flex items-center justify-center overflow-hidden perspective-[1000px]`}>
+    <div className="absolute inset-0" style={{ backgroundImage: GRID_DOTS2, backgroundSize: '16px 16px', opacity: 0.5 }}></div>
+    <div className="absolute w-64 h-64 bg-blue-100/40 rounded-full blur-[60px]"></div>
+    <div className="relative w-52 h-64 transition-transform duration-700 group hover:-translate-y-2" style={{ transformStyle: 'preserve-3d' }}>
+      <div className={`absolute inset-0 bg-white/60 backdrop-blur-sm rounded-xl border border-slate-100 ${SOFT_SHADOW2} transform rotate-6 translate-x-4 translate-y-2 origin-bottom-right p-4 flex flex-col`}>
+        <div className="w-full h-full border-2 border-dashed border-slate-200 rounded-lg relative flex items-center justify-center">
+            <div className="absolute w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center"><div className="w-2 h-2 bg-blue-400 rounded-full"></div></div>
+        </div>
+      </div>
+      <div className={`absolute inset-0 bg-white/95 backdrop-blur-sm rounded-xl border border-white ${FLOATING_SHADOW2} p-4 flex flex-col transform transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-4`}>
+        <div className="w-full aspect-[4/3] bg-gradient-to-br from-blue-50 to-slate-50 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+          <div className="w-10 h-10 border-2 border-blue-200/50 rounded-full"></div>
+          <div className="absolute top-2 right-2 w-12 h-4 bg-white/80 rounded-full border border-white shadow-sm"></div>
+        </div>
+        <div className="w-3/4 h-3 bg-slate-700/10 rounded-full mb-2"></div>
+        <div className="w-1/2 h-2 bg-slate-300 rounded-full mb-auto"></div>
+        <div className="flex justify-between items-center pt-3 border-t border-slate-50 mt-2">
+          <div className="w-10 h-3 bg-blue-500/20 rounded-full"></div>
+          <div className="w-16 h-6 bg-blue-500 rounded-full shadow-sm flex items-center justify-center">
+             <div className="w-6 h-1 bg-white/80 rounded-full"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
-         {/* 环绕卡片 (Orbiting Cards) */}
-         <div className="absolute inset-0">
-            {FEATURES.map((feature, i) => {
-              const positions = [
-                "top-0 left-0 md:top-10 md:left-10",
-                "top-0 right-0 md:top-10 md:right-10",
-                "bottom-0 left-0 md:bottom-10 md:left-10",
-                "bottom-0 right-0 md:bottom-10 md:right-10"
-              ];
-              const colors = [
-                { bg: "bg-blue-50", border: "border-blue-100", text: "text-blue-500", line: "from-blue-200 to-transparent" },
-                { bg: "bg-indigo-50", border: "border-indigo-100", text: "text-indigo-500", line: "from-indigo-200 to-transparent" },
-                { bg: "bg-emerald-50", border: "border-emerald-100", text: "text-emerald-500", line: "from-emerald-200 to-transparent" },
-                { bg: "bg-violet-50", border: "border-violet-100", text: "text-violet-500", line: "from-violet-200 to-transparent" }
-              ];
-              const lineStyles = [
-                 `top-[50%] left-[100%] w-32 h-px bg-gradient-to-r ${colors[i].line} transform rotate-45 origin-left`,
-                 `top-[50%] right-[100%] w-32 h-px bg-gradient-to-l ${colors[i].line} transform -rotate-45 origin-right`,
-                 `top-[50%] left-[100%] w-32 h-px bg-gradient-to-r ${colors[i].line} transform -rotate-45 origin-left`,
-                 `top-[50%] right-[100%] w-32 h-px bg-gradient-to-l ${colors[i].line} transform rotate-45 origin-right`
-              ];
-              
-              return (
-                <motion.div
-                  key={feature.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: i * 0.15 }}
-                  viewport={{ once: true }}
-                  className={`absolute ${positions[i]} w-[45%] md:w-[320px] bg-white/80 backdrop-blur-xl border border-white p-6 rounded-3xl hover:bg-white transition-all duration-300 group cursor-pointer z-30 shadow-[0_20px_40px_rgba(0,0,0,0.04)] hover:-translate-y-2`}
-                >
-                   <div className="flex items-center gap-4 mb-4">
-                      <div className={`w-12 h-12 ${colors[i].bg} rounded-xl flex items-center justify-center border ${colors[i].border}`}>
-                         <feature.icon className={`w-6 h-6 ${colors[i].text}`} />
-                      </div>
-                      <h3 className="text-slate-800 font-bold text-lg">{feature.title}</h3>
-                   </div>
-                   <p className="text-slate-500 text-sm leading-relaxed">{feature.desc}</p>
-                   {/* 隐喻连接线 */}
-                   <div className={`hidden md:block absolute ${lineStyles[i]} pointer-events-none`}></div>
-                </motion.div>
-              )
-            })}
+const GraphicDeparture = () => (
+  <div className={`relative w-full aspect-[16/10] ${GRAPHIC_BG2} rounded-[2rem] flex items-center justify-center overflow-hidden p-6`}>
+    <div className="absolute top-8 left-12 w-2 h-2 bg-blue-300 rounded-full animate-pulse"></div>
+    <div className="absolute bottom-12 right-16 w-3 h-3 bg-blue-200 rounded-full animate-pulse delay-75"></div>
+    <div className={`relative z-10 w-[70%] h-[90%] bg-white rounded-xl border border-white ${FLOATING_SHADOW2} flex flex-col overflow-hidden transition-transform duration-700 hover:rotate-1 hover:scale-105`}>
+      <div className="w-full h-[55%] p-3 pb-0">
+         <div className="w-full h-full bg-slate-100 rounded-lg relative overflow-hidden flex items-center justify-center">
+            <div className="absolute inset-0 bg-gradient-to-tr from-blue-50 to-slate-100"></div>
+            <div className="w-16 h-16 border-4 border-white/50 rounded-full absolute z-10"></div>
+            <div className="w-24 h-24 border-4 border-white/30 rounded-full absolute -translate-x-8 translate-y-8"></div>
          </div>
       </div>
+      <div className="flex-1 flex flex-col relative pt-4 pb-4 px-5">
+         <div className="absolute top-0 left-0 w-full border-t-[2px] border-dashed border-slate-100"></div>
+         <div className="absolute top-0 -left-3 w-6 h-6 bg-[#f4f7fb] rounded-full -translate-y-1/2 shadow-inner"></div>
+         <div className="absolute top-0 -right-3 w-6 h-6 bg-[#f4f7fb] rounded-full -translate-y-1/2 shadow-inner"></div>
+         <div className="flex justify-between items-center mb-3 mt-1">
+            <div className="w-1/2 h-3 bg-slate-800/10 rounded-full"></div>
+            <div className="w-6 h-6 rounded-md bg-blue-50 flex items-center justify-center text-blue-400">✨</div>
+         </div>
+         <div className="space-y-2 mb-auto">
+           <div className="w-[90%] h-1.5 bg-slate-200 rounded-full"></div>
+           <div className="w-[75%] h-1.5 bg-slate-200 rounded-full"></div>
+           <div className="w-[40%] h-1.5 bg-slate-200 rounded-full"></div>
+         </div>
+         <div className="absolute bottom-3 right-4 w-10 h-10 border-2 border-red-100 rounded-full flex items-center justify-center transform -rotate-12 opacity-80">
+            <div className="w-6 h-1 bg-red-100 rounded-full"></div>
+         </div>
+      </div>
+    </div>
+  </div>
+);
+
+// ==========================================
+// FeatureRow 组件
+// ==========================================
+const FeatureRow = ({ number, eyebrow, title, description, graphic, features, reverse }) => {
+  return (
+    <div className={`relative flex flex-col md:flex-row items-center justify-between w-full mb-20 group ${reverse ? 'md:flex-row-reverse' : ''}`}>
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center">
+        <div className="absolute w-12 h-12 rounded-full bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-blue-500 group-hover:border-blue-100">
+          {number}
+        </div>
+      </div>
+      <div className={`w-full md:w-[45%] mb-8 md:mb-0 ${reverse ? 'md:pl-8 lg:pl-16' : 'md:pr-8 lg:pr-16'}`}>
+        {graphic}
+      </div>
+      <div className={`w-full md:w-[45%] ${reverse ? 'md:pr-8 lg:pr-16' : 'md:pl-8 lg:pl-16'}`}>
+        <div className="flex items-center mb-3">
+          <span className="label text-blue-500">{eyebrow}</span>
+          <div className="h-px w-8 bg-blue-100 ml-4"></div>
+        </div>
+        <h3 className="text-[32px] leading-tight font-bold text-slate-900 mb-4 tracking-tight">{title}</h3>
+        <p className="text-slate-500 text-base leading-relaxed mb-6 font-normal">{description}</p>
+        <div className="flex flex-wrap gap-3">
+          {features.map((feature, idx) => (
+            <div key={idx} className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600 shadow-sm shadow-slate-100/50">
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5"></div>
+              {feature.text}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// 私有核心资产组件 (code2.md)
+// ==========================================
+const ConceptLightNexus = () => (
+  <section id="解决方案" className="relative w-full min-h-screen flex flex-col items-center justify-center py-20 overflow-hidden bg-[#f4f4f5]">
+    <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-blue-400/20 rounded-full blur-[100px] animate-pulse"></div>
+    <div className="absolute bottom-1/4 right-1/4 w-[30vw] h-[30vw] bg-indigo-400/20 rounded-full blur-[100px] animate-pulse"></div>
+
+    <div className="relative z-10 text-center mb-16">
+      <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">私有核心资产</h2>
+      <p className="mt-4 text-slate-500 text-lg font-normal">全域掌控，构建品牌绝对壁垒</p>
+    </div>
+
+    <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl px-6">
+      {PRIVATE_FEATURES.map((feature) => (
+        <div key={feature.id} className="group relative rounded-[2rem] p-[1px] overflow-hidden transition-transform duration-500 hover:-translate-y-2">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/80 via-white/20 to-white/0 z-0"></div>
+          <div className="relative z-10 h-full bg-white/40 backdrop-blur-2xl rounded-[2rem] p-8 flex flex-col items-start shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center bg-white/60 shadow-sm border border-white mb-6 group-hover:scale-110 transition-transform duration-500`}>
+              <feature.icon className={`w-5 h-5 ${feature.color}`} strokeWidth={1.5} />
+            </div>
+            <h3 className="text-xl font-semibold text-slate-800 mb-3">{feature.title}</h3>
+            <p className="text-slate-600 leading-relaxed font-normal text-base">{feature.desc}</p>
+          </div>
+        </div>
+      ))}
     </div>
   </section>
 );
 
 const CASES = [
-  { 
-    name: '荔波小七孔', 
-    ai: '七妹智能体', 
-    type: '景区', 
-    image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800',
+  {
+    name: '荔波小七孔',
+    ai: '七妹智能体',
+    type: '景区',
+    image: '/case-libo.jpeg',
+    cardImage: '/case-1.png',
     desc: '世界自然遗产地，游客可通过七妹智能体获取实时导览、景点推荐与门票预约服务。'
   },
-  { 
-    name: '凯里下司古镇', 
-    ai: '阿糯智能体', 
-    type: '古镇', 
-    image: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=800',
+  {
+    name: '凯里下司古镇',
+    ai: '阿糯智能体',
+    type: '古镇',
+    image: '/case-xiasi.jpeg',
+    cardImage: '/case-2.png',
     desc: '体验当地特色民俗文化，阿糯智能体提供专属导览与手工艺品预约服务。'
   },
-  { 
-    name: '息烽天沐温泉', 
-    ai: '沐沐智能体', 
-    type: '温泉度假区', 
-    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800',
+  {
+    name: '息烽天沐温泉',
+    ai: '沐沐智能体',
+    type: '温泉度假区',
+    image: '/case-tianmu.jpeg',
+    cardImage: '/case-3.png',
     desc: '沐沐智能体为游客提供温泉预约、水疗推荐与周边餐饮指引服务。'
   },
-  { 
-    name: '云从朵花酒店', 
-    ai: '朵朵智能体', 
-    type: '酒店', 
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+  {
+    name: '云从朵花酒店',
+    ai: '朵朵智能体',
+    type: '酒店',
+    image: '/case-duohua.jpeg',
+    cardImage: '/case-4.png',
     desc: '朵朵智能体提供入住指引、客房服务与本地旅游推荐，打造智能入住体验。'
+  },
+  {
+    name: '梵净山栖溪酒店',
+    ai: '栖栖智能体',
+    type: '酒店',
+    image: '/case-fanjingshan.jpeg',
+    cardImage: '/case-fanjingshan.png',
+    desc: '栖栖智能体为宾客提供景区导览、特色体验预约与专属管家服务，打造沉浸式山居体验。'
   },
 ];
 
@@ -507,37 +639,37 @@ const CASES = [
 // 游客视角卡片数据 (code-two.md)
 // ==========================================
 const TOURIST_CARDS = [
-  { 
-    id: 't1', 
-    type: 'tourist', 
-    title: '景点推荐与预订', 
-    desc: '整合实时运营状态与口碑，提供无缝体验预订与精准推荐。', 
-    detailedDesc: '深度打通目的地实时客流、天气状况与全网真实口碑，通过大模型引擎构建动态知识图谱。不仅能为游客提供个性化的避障与游玩路线规划，更从底层打通了支付与核销系统。真正实现从"种草-决策-预订-体验"的无缝闭环。', 
-    image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200' 
+  {
+    id: 't1',
+    type: 'tourist',
+    title: '景点推荐与预订',
+    desc: '整合实时运营状态与口碑，提供无缝体验预订与精准推荐。',
+    detailedDesc: '深度打通目的地实时客流、天气状况与全网真实口碑，通过大模型引擎构建动态知识图谱。不仅能为游客提供个性化的避障与游玩路线规划，更从底层打通了支付与核销系统。真正实现从"种草-决策-预订-体验"的无缝闭环。',
+    image: '/case-banner-1.png'
   },
-  { 
-    id: 't2', 
-    type: 'tourist', 
-    title: '即时呼叫服务', 
-    desc: '语音交互，随时响应延迟退房、活动报名等即时需求。', 
-    detailedDesc: '搭载支持多语种、带有情感计算的自然语言处理引擎。无论是清晨要求延迟退房，还是深夜的紧急求助呼叫，系统均能做到毫秒级精准意图识别并自动流转工单给相应部门。提供 7x24 小时零延迟、带有温度的专属管家服务。', 
-    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200' 
+  {
+    id: 't2',
+    type: 'tourist',
+    title: '即时呼叫服务',
+    desc: '语音交互，随时响应延迟退房、活动报名等即时需求。',
+    detailedDesc: '搭载支持多语种、带有情感计算的自然语言处理引擎。无论是清晨要求延迟退房，还是深夜的紧急求助呼叫，系统均能做到毫秒级精准意图识别并自动流转工单给相应部门。提供 7x24 小时零延迟、带有温度的专属管家服务。',
+    image: '/case-banner-2.png'
   },
-  { 
-    id: 't3', 
-    type: 'tourist', 
-    title: '延续性伴游记忆', 
-    desc: '持续感知游客偏好，记忆延续，告别千篇一律的机械推荐。', 
-    detailedDesc: 'AI 智能体会持续学习并记录游客的每一次交互、偏好标签与消费习惯，沉淀为专属 User Profile。当游客跨越不同场景，或下一次复游时，服务能做到无缝接续，主动屏蔽已排斥选项，真正实现"越用越懂你"的陪伴。', 
-    image: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?q=80&w=1200' 
+  {
+    id: 't3',
+    type: 'tourist',
+    title: '延续性伴游记忆',
+    desc: '持续感知游客偏好，记忆延续，告别千篇一律的机械推荐。',
+    detailedDesc: 'AI 智能体会持续学习并记录游客的每一次交互、偏好标签与消费习惯，沉淀为专属 User Profile。当游客跨越不同场景，或下一次复游时，服务能做到无缝接续，主动屏蔽已排斥选项，真正实现"越用越懂你"的陪伴。',
+    image: '/case-banner-3.png'
   },
-  { 
-    id: 't4', 
-    type: 'tourist', 
-    title: '现实场景交互', 
-    desc: '联动线下随身机器人与硬件，跨越屏幕主动提供人性化服务。', 
-    detailedDesc: '突破数字屏幕限制，让 AI 拥有物理载体。系统深度联动景区内的智能向导车、酒店配送机器人及 IoT 硬件。当游客靠近特定区域时，不仅手机端有向导推送，实体机器人也能主动识别、迎宾带路，打造虚实共生的未来文旅体验。', 
-    image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=1200' 
+  {
+    id: 't4',
+    type: 'tourist',
+    title: '现实场景交互',
+    desc: '联动线下随身机器人与硬件，跨越屏幕主动提供人性化服务。',
+    detailedDesc: '突破数字屏幕限制，让 AI 拥有物理载体。系统深度联动景区内的智能向导车、酒店配送机器人及 IoT 硬件。当游客靠近特定区域时，不仅手机端有向导推送，实体机器人也能主动识别、迎宾带路，打造虚实共生的未来文旅体验。',
+    image: '/case-banner-4.png'
   }
 ];
 
@@ -545,45 +677,29 @@ const TOURIST_CARDS = [
 // 内部视角卡片数据 (code-two.md)
 // ==========================================
 const INTERNAL_CARDS = [
-  { 
-    id: 'i1', 
-    type: 'internal', 
-    title: '操作类：减错提效', 
-    desc: '酒店开关房、货盘追踪、PMS系统与票务状态实时自动更新。', 
-    detailedDesc: '针对日常操作提供 RPA 级别系统赋能。员工无需跨系统反复录入，智能体能自动同步 PMS 房态、执行库存盘点、货盘追踪及多渠道票务状态更新。将一线员工从枯燥操作中解放，实现真正降本与减错。', 
-    image: 'https://images.unsplash.com/photo-1551288049-bbda38a10ad5?q=80&w=1200' 
+  {
+    id: 'i1',
+    type: 'internal',
+    title: '操作类：减错提效',
+    desc: '酒店开关房、货盘追踪、PMS系统与票务状态实时自动更新。',
+    detailedDesc: '针对日常操作提供 RPA 级别系统赋能。员工无需跨系统反复录入，智能体能自动同步 PMS 房态、执行库存盘点、货盘追踪及多渠道票务状态更新。将一线员工从枯燥操作中解放，实现真正降本与减错。',
+    image: '/internal-banner-1.png'
   },
-  { 
-    id: 'i2', 
-    type: 'internal', 
-    title: '流程类：稳定复制', 
-    desc: '智能派发工单，自动生成运营日报、月报及全渠道营销文案。', 
-    detailedDesc: '将企业优秀运营经验沉淀为算法模型。全天候监听业务异常节点并智能流转工单。同时基于海量数据，一键自动生成高度结构化的日/月报，更能批量生成符合小红书、抖音等语境的高转化营销文案。', 
-    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200' 
+  {
+    id: 'i2',
+    type: 'internal',
+    title: '流程类：稳定复制',
+    desc: '智能派发工单，自动生成运营日报、月报及全渠道营销文案。',
+    detailedDesc: '将企业优秀运营经验沉淀为算法模型。全天候监听业务异常节点并智能流转工单。同时基于海量数据，一键自动生成高度结构化的日/月报，更能批量生成符合小红书、抖音等语境的高转化营销文案。',
+    image: '/internal-banner-2.png'
   },
-  { 
-    id: 'i3', 
-    type: 'internal', 
-    title: '思考类：辅助决策', 
-    desc: '深度智能问数分析，市场动态代理调价，数据驱动的精准推荐。', 
-    detailedDesc: '为管理层配备 24 小时在线的数据科学家。支持自然语言"问数"交互，秒级生成可视化洞察。更具备市场动态调价功能，依据竞品动态与供需曲线自动计算最优收益率价格，实现敏捷商业决策。', 
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200' 
-  },
-  { 
-    id: 'i4', 
-    type: 'internal', 
-    title: '设计类：统一高效', 
-    desc: 'AIGC 高质量海报与短视频生成，符合企业特性的定制 IP 建模。', 
-    detailedDesc: '突破内容创作产能瓶颈。内置专属品牌微调大模型，输入简单 Prompt 即可大批量生成活动海报、短视频脚本，乃至构建符合品牌调性的 3D 虚拟 IP。保证品牌视觉高度统一，将物料产出周期缩短至秒级。', 
-    image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=1200' 
-  },
-  { 
-    id: 'i5', 
-    type: 'internal', 
-    title: '定制类：降本增效', 
-    desc: '游客合照智能优化，自动化满意度问卷，精准规划专属电子地图。', 
-    detailedDesc: '关注高频服务触点创新。利用端侧 AI 为游客自动合成完美打卡合照提升分享意愿；在最佳情绪触点自动触发交互问卷；基于游客偏好一键生成专属纪念地图，用极低边际成本创造无量情绪价值。', 
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200' 
+  {
+    id: 'i3',
+    type: 'internal',
+    title: '思考类：辅助决策',
+    desc: '深度智能问数分析，市场动态代理调价，数据驱动的精准推荐。',
+    detailedDesc: '为管理层配备 24 小时在线的数据科学家。支持自然语言"问数"交互，秒级生成可视化洞察。更具备市场动态调价功能，依据竞品动态与供需曲线自动计算最优收益率价格，实现敏捷商业决策。',
+    image: '/internal-banner-3.png'
   }
 ];
 
@@ -604,9 +720,9 @@ const DetailModal = ({ card, onClose }) => {
         {/* 左侧大图展示区 */}
         <div className="w-full md:w-[45%] bg-slate-50 min-h-[300px] md:min-h-[500px] flex items-center justify-center p-4">
           <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm bg-slate-100">
-            <img 
-              src={card.image} 
-              alt={card.title} 
+            <img
+              src={card.image}
+              alt={card.title}
               className="w-full h-full object-cover"
             />
           </div>
@@ -614,12 +730,12 @@ const DetailModal = ({ card, onClose }) => {
 
         {/* 右侧文本区 */}
         <div className="w-full md:w-[55%] p-8 md:p-12 flex flex-col justify-center overflow-y-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 font-semibold text-[12px] uppercase tracking-wider rounded-md mb-6 w-fit">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 font-medium text-[12px] uppercase tracking-wider rounded-md mb-6 w-fit">
             <Sparkles className="w-3.5 h-3.5" /> {card.type === 'tourist' ? 'Tourist Perspective' : 'Internal Perspective'}
           </div>
           <h2 className="text-[32px] md:text-[40px] font-bold text-slate-900 leading-tight tracking-tight mb-4">{card.title}</h2>
-          <p className="text-[18px] text-slate-600 font-medium mb-8 pb-8 border-b border-slate-100 leading-relaxed">{card.desc}</p>
-          <div className="space-y-6 text-[16px] text-slate-500 leading-[1.8] font-normal">
+          <p className="text-lg text-slate-600 font-normal mb-8 pb-8 border-b border-slate-100 leading-relaxed">{card.desc}</p>
+          <div className="space-y-6 text-base text-slate-500 leading-relaxed font-normal">
             {card.detailedDesc.split('。').filter(Boolean).map((s, i) => <p key={i}>{s + '。'}</p>)}
           </div>
         </div>
@@ -628,37 +744,64 @@ const DetailModal = ({ card, onClose }) => {
   );
 };
 
-// ==========================================
-// 画廊卡片组件
-// ==========================================
-const GalleryCard = ({ card, onSelect }) => {
+const ContactModal = ({ onClose }) => {
   return (
-    <div className="shrink-0 w-[85vw] md:w-[40vw] h-[55vh] md:h-[65vh] flex flex-col group cursor-pointer" onClick={() => onSelect(card)}>
-      <div className="w-full h-full bg-white rounded-3xl p-2 shadow-sm shadow-slate-200/20 border border-white flex flex-col overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-sm">
-         
-         {/* 图片容器区 */}
-         <div className="relative w-full flex-1 rounded-2xl overflow-hidden bg-slate-100">
-            <img
-              src={card.image}
-              alt={card.title}
-              className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-[11px] font-bold text-slate-600 uppercase tracking-widest shadow-sm">
-              {card.type}
-            </div>
-         </div>
-
-         {/* 文本区 */}
-         <div className="p-6 h-32 flex flex-col justify-center" dir="ltr">
-            <h3 className="text-[22px] font-bold text-slate-900 tracking-tight">{card.title}</h3>
-            <div className="mt-2 flex items-center text-blue-500 font-semibold text-sm opacity-0 transform translate-x-[-10px] transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
-              查阅详情 <ArrowRight className="w-4 h-4 ml-1" />
-            </div>
-         </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={onClose}></div>
+      <div className="relative w-full max-w-md bg-white rounded-[2rem] shadow-2xl p-10 flex flex-col items-center text-center animate-[in_0.3s_ease-out]">
+        <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center transition-colors">
+          <X className="w-5 h-5" />
+        </button>
+        <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-6">
+          <MessageSquare className="w-8 h-8 text-blue-500" />
+        </div>
+        <h3 className="text-2xl font-bold text-slate-900 mb-4">联系我们</h3>
+        <p className="text-slate-500 mb-8">期待与您交流合作机会</p>
+        <a 
+          href="mailto:znkj@nianxx.com" 
+          className="text-xl font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+        >
+          znkj@nianxx.com
+        </a>
       </div>
     </div>
   );
 };
+
+// ==========================================
+// ==========================================
+// 画廊卡片组件 (code-two.md)
+// ==========================================
+const GalleryCard = ({ card, onSelect }) => (
+  <div
+    onClick={() => onSelect(card)}
+    className="group relative w-full bg-white rounded-[2rem] border border-slate-100 overflow-hidden cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all duration-500 mb-12 md:snap-center md:mb-12"
+  >
+    <div className="relative aspect-[16/9] overflow-hidden">
+      <img
+        src={card.image}
+        alt={card.title}
+        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+      />
+    </div>
+    <div className="p-8 md:p-10 flex flex-col items-start">
+      <div className="flex justify-between items-start w-full mb-4">
+        <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tighter group-hover:text-blue-600 transition-colors">
+          {card.title}
+        </h3>
+        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+          <Plus className="w-5 h-5" />
+        </div>
+      </div>
+      <p className="text-slate-500 text-base md:text-lg leading-relaxed max-w-2xl font-normal">
+        {card.desc}
+      </p>
+      <div className="mt-8 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-blue-500 transition-colors">
+        Read Case Study <ArrowRight className="w-3 h-3" />
+      </div>
+    </div>
+  </div>
+);
 
 // --- Feature Carousel Component ---
 function FeatureCarouselSection({ features, theme = "light" }) {
@@ -1225,7 +1368,7 @@ const HeroRobotAvatar = () => {
                       </div>
                     </div>
                     {/* Chat Messages */}
-                    <div className="p-4 space-y-3 bg-slate-50 max-h-40 overflow-y-auto">
+                    <div className="p-4 space-y-3 bg-slate-50 max-h-60 overflow-y-auto">
                       {feature.chat.map((msg, idx) => (
                         <div key={idx} className={cn(
                           "flex gap-2",
@@ -1233,8 +1376,8 @@ const HeroRobotAvatar = () => {
                         )}>
                           <div className={cn(
                             "w-7 h-7 rounded-full flex items-center justify-center shrink-0 shadow-sm",
-                            msg.role === "user" 
-                              ? "bg-gradient-to-br from-blue-500 to-cyan-500 text-white" 
+                            msg.role === "user"
+                              ? "bg-gradient-to-br from-blue-500 to-cyan-500 text-white"
                               : "bg-gradient-to-br from-slate-600 to-slate-700 text-white"
                           )}>
                             {msg.role === "user" ? (
@@ -1244,25 +1387,142 @@ const HeroRobotAvatar = () => {
                             )}
                           </div>
                           <div className={cn(
-                            "flex-1 px-3 py-2 rounded-2xl text-xs leading-relaxed shadow-sm",
-                            msg.role === "user" 
-                              ? "bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-tr-sm" 
-                              : "bg-white text-slate-700 rounded-tl-sm border border-slate-200"
+                            "flex-1 rounded-2xl text-xs leading-relaxed shadow-sm overflow-hidden",
+                            msg.role === "user"
+                              ? "px-3 py-2 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-tr-sm"
+                              : "rounded-tl-sm border border-slate-200"
                           )}>
-                            {msg.text}
+                            {msg.role === "user" ? (
+                              <span className="text-xs">{msg.text}</span>
+                            ) : (
+                              <>
+                                {feature.label === "景点推荐" && (
+                                  <div className="bg-white">
+                                    <div className="h-24 bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+                                      <div className="text-center text-white">
+                                        <div className="text-lg font-bold">荔波小七孔</div>
+                                        <div className="text-xs opacity-80">世界自然遗产</div>
+                                      </div>
+                                    </div>
+                                    <div className="p-3 space-y-2">
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-slate-500">距离您</span>
+                                        <span className="font-medium text-slate-900">约15公里</span>
+                                      </div>
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-slate-500">建议游览</span>
+                                        <span className="font-medium text-slate-900">3-4小时</span>
+                                      </div>
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-slate-500">门票优惠</span>
+                                        <span className="font-bold text-emerald-600">8折起</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                                {feature.label === "餐饮预约" && (
+                                  <div className="bg-white">
+                                    <div className="p-3 space-y-2">
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center text-xl">🍜</div>
+                                        <div>
+                                          <div className="font-medium text-slate-900 text-xs">苗家酸汤鱼</div>
+                                          <div className="flex items-center gap-1 text-[10px] text-slate-500">
+                                            <span className="text-amber-500">★★★★★</span>
+                                            <span>4.8分</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                                        <span className="text-slate-500">步行距离</span>
+                                        <span className="font-medium text-slate-900">约5分钟</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                                {feature.label === "活动报名" && (
+                                  <div className="bg-white">
+                                    <div className="p-3 space-y-2">
+                                      <div className="flex items-center gap-2">
+                                        <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">限时</span>
+                                        <span className="font-medium text-slate-900 text-xs">苗族篝火晚会</span>
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-2 text-[10px]">
+                                        <div className="flex items-center gap-1 text-slate-500">
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                          今晚20:00
+                                        </div>
+                                        <div className="flex items-center gap-1 text-slate-500">
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                          民俗广场
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                                        <span className="text-slate-500">门票价格</span>
+                                        <span className="font-bold text-red-500">¥68/人</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                                {feature.label === "酒店服务" && (
+                                  <div className="bg-white p-3">
+                                    <div className="flex items-center gap-2 text-emerald-600 mb-2">
+                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+                                      <span className="font-medium text-xs">已办理成功</span>
+                                    </div>
+                                    <div className="space-y-1 text-xs text-slate-600">
+                                      <div>• 延迟退房至14:00</div>
+                                      <div>• 如需其他服务请随时呼叫</div>
+                                    </div>
+                                  </div>
+                                )}
+                                {feature.label === "AI伴游" && (
+                                  <div className="bg-white">
+                                    <div className="p-3 space-y-2">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-xl flex items-center justify-center text-2xl">
+                                          ☀️
+                                        </div>
+                                        <div>
+                                          <div className="text-slate-900 font-medium text-sm">明天多云转晴</div>
+                                          <div className="text-slate-500 text-xs">18-26°C 适合出行</div>
+                                        </div>
+                                      </div>
+                                      <div className="text-[10px] text-slate-500 bg-slate-50 p-2 rounded-lg">
+                                        建议上午游览景区，下午可在酒店休息享受温泉
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                                {feature.label === "趣味拍照" && (
+                                  <div className="bg-white p-3">
+                                    <div className="text-center mb-2">
+                                      <div className="text-3xl mb-1">📸</div>
+                                      <div className="font-medium text-slate-900 text-xs">拍照准备中</div>
+                                    </div>
+                                    <div className="space-y-1 text-[10px] text-slate-500">
+                                      <div>• 请站在红色标记处</div>
+                                      <div>• 看向镜头方向</div>
+                                      <div className="text-center text-slate-400 mt-2">3... 2... 1... 📷</div>
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            )}
                           </div>
                         </div>
                       ))}
                     </div>
+
                     {/* Input Box */}
                     <div className="p-3 bg-white border-t border-slate-200">
                       <div className="flex items-center gap-2 px-3 py-2.5 bg-slate-100 rounded-xl border border-slate-200 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-400 shrink-0">
                           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
-                        <input 
-                          type="text" 
-                          placeholder="输入消息..." 
+                        <input
+                          type="text"
+                          placeholder="输入消息..."
                           className="flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
                         />
                         <button className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white hover:opacity-90 transition-opacity shrink-0">
@@ -1369,7 +1629,7 @@ export function FeatureCarousel({ features, theme = "light" }) {
                       "relative flex items-center gap-4 px-6 md:px-10 lg:px-8 py-3.5 md:py-5 lg:py-4 rounded-full transition-all duration-700 text-left group border",
                       isActive
                         ? isDark ? "bg-white/10 text-cyan-400 border-white/20 z-10" : "bg-white text-blue-600 border-slate-200 z-10"
-                        : isDark ? "text-white/60 border-white/20 hover:border-white/40 hover:text-white" : "text-slate-500 border-transparent hover:border-white/40 hover:text-slate-700"
+                        : isDark ? "text-white/60 border-white/20 hover:border-white/40 hover:text-white" : "text-slate-500 border-transparent hover:border-white/40 hover:text-slate-800"
                     )}
                   >
                     <div
@@ -1773,7 +2033,7 @@ export function PillMorphTabs({ items = [], defaultValue, onValueChange, classNa
                     ref={(el) => (triggerRefs.current[it.value] = el)}
                     className={cn(
                       "relative px-6 py-2 rounded-full text-sm font-semibold transition-colors flex items-center justify-center gap-2",
-                      isActive ? "text-slate-900" : "text-slate-500 hover:text-slate-700"
+                      isActive ? "text-slate-900" : "text-slate-500 hover:text-slate-800"
                     )}
                   >
                     {it.label}
@@ -1801,6 +2061,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('tourist');
   const [selectedCase, setSelectedCase] = useState(0);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [showContactModal, setShowContactModal] = useState(false);
   const scrollRef1 = useRef(null);
   const scrollRef2 = useRef(null);
 
@@ -1880,10 +2141,10 @@ export default function App() {
       {/* --- 导航：悬浮药丸 (Floating Pill Nav) --- */}
       <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-6 pointer-events-none">
         <nav className={`pointer-events-auto transition-all duration-500 ease-out flex items-center justify-between px-2 py-2 rounded-full ${isScrolled ? 'bg-white/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/80 w-full max-w-4xl' : 'bg-transparent border border-transparent w-full max-w-7xl px-0'}`}>
-          <div className="flex items-center gap-2 px-4 cursor-pointer">
+          <div className="flex items-center gap-2 px-4 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <img src="/logo.png" alt="NIANXX" className="h-7" />
           </div>
-          
+
           <div className={`hidden md:flex items-center gap-2 ${isScrolled ? '' : 'bg-white/50 backdrop-blur-md rounded-full px-2 border border-white/60 shadow-sm'}`}>
             {['解决方案', '产品功能', '落地案例'].map((item) => (
               <a key={item} href={`#${item}`} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-black/5 rounded-full transition-colors">
@@ -1893,10 +2154,24 @@ export default function App() {
           </div>
 
           <div className="px-2">
-            <ShinyButton size="small">联系我们</ShinyButton>
+            <ShinyButton size="small" onClick={() => setShowContactModal(true)}>联系我们</ShinyButton>
           </div>
         </nav>
       </div>
+
+      {/* --- 返回顶部按钮 --- */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: isScrolled ? 1 : 0, scale: isScrolled ? 1 : 0.8 }}
+        transition={{ duration: 0.3 }}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="fixed bottom-8 right-8 z-50 w-12 h-12 bg-white/80 backdrop-blur-xl shadow-lg border border-slate-200/50 rounded-full flex items-center justify-center hover:bg-white hover:shadow-xl transition-all cursor-pointer"
+        style={{ pointerEvents: isScrolled ? 'auto' : 'none' }}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-600">
+          <path d="M12 19V5M5 12l7-7 7 7"/>
+        </svg>
+      </motion.button>
 
       {/* --- Section 1: Hero (Animated Face) --- */}
       <AuroraBackground className="min-h-[90vh] pt-40 pb-32">
@@ -1913,19 +2188,18 @@ export default function App() {
               基于酒店 / 景区 / 目的地
             </div>
             
-            <h1 className="text-5xl md:text-[5rem] font-bold tracking-tighter text-slate-900 leading-[1.05] mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold tracking-tighter text-slate-900 leading-[1.05] mb-6">
               陌生之处<br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-500">不再孤身一人。</span>
             </h1>
             
-            <p className="text-xl font-medium text-slate-700 mb-6 flex items-center gap-2">行中服务与消费 AI 智能体</p>
-            <p className="text-lg text-slate-500 leading-relaxed mb-10 max-w-md font-light">
+            <p className="text-xl font-medium text-slate-800 mb-6 flex items-center gap-2">行中服务与消费 AI 智能体</p>
+            <p className="text-lg text-slate-500 leading-relaxed mb-10 max-w-md font-normal">
               通过部署私有化 AI 智能体，为您的游客重塑行中服务与消费体验。
             </p>
             
             <div className="flex flex-wrap gap-4">
-              <GlowButton primary>查看产品体系 <ArrowRight size={16} /></GlowButton>
-              <GlowButton>了解合作方式</GlowButton>
+              <GlowButton primary onClick={() => document.getElementById('产品功能')?.scrollIntoView({ behavior: 'smooth' })}>查看产品体系 <ArrowRight size={16} /></GlowButton>
             </div>
           </motion.div>
 
@@ -1942,19 +2216,22 @@ export default function App() {
       </AuroraBackground>
 
       {/* --- Section 2: 市场洞察 --- */}
-      <section className="py-24 relative z-10 bg-white">
+      <section className="py-12 relative z-10 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col gap-12 mb-24">
-            <div className="text-center max-w-2xl mx-auto">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-6 leading-tight">
-                <span className="text-blue-600 bg-blue-100/50 px-2 py-1 rounded-xl">40%</span> 的行程消费<br/>发生于抵达之后。
+          <div className="flex flex-col gap-6 mb-12">
+            <div className="text-center max-w-2xl mx-auto p-0 mb-0">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-6 leading-tight">
+                <span className="text-blue-600 bg-blue-100/50 px-2 py-1 rounded-xl">40%</span>
               </h2>
-              <p className="text-lg text-slate-500 font-light leading-relaxed">
-                餐饮、体验、购物与交通消费持续发生，却分散且低效。在最接近交易的黄金节点，市场亟需一个<strong className="font-bold text-slate-700">懂场景、懂游客、懂本地供给</strong>的智能入口。
+              <p className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 leading-tight mb-4">
+                的行程消费发生于抵达之后
+              </p>
+              <p className="text-lg text-slate-500 font-normal leading-relaxed mb-6">
+                餐饮、体验、购物与交通消费持续发生，却分散且低效。在最接近交易的黄金节点，市场亟需一个<strong className="font-bold text-slate-800">懂场景、懂游客、懂本地供给</strong>的智能入口。
               </p>
             </div>
             
-            <div className="relative w-full h-[300px] md:h-[350px] -mx-6 md:mx-0">
+            <div className="relative w-full h-[200px] md:h-[250px] -mx-6 md:mx-0">
                <MagnifiedBento />
             </div>
           </div>
@@ -1963,21 +2240,21 @@ export default function App() {
             <div className="hidden md:block absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent -z-10"></div>
             
             <SurfaceCard delay={100} hover={false} className="!bg-white/40 opacity-70">
-              <div className="text-xs font-bold text-slate-400 mb-3 uppercase tracking-widest">Pre-trip</div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-2">行前市场 <span className="text-sm font-normal text-slate-500 bg-slate-200/50 px-2 py-0.5 rounded-md">高度饱和</span></h3>
+              <div className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-widest">Pre-trip</div>
+              <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">行前市场 <span className="text-sm font-normal text-slate-500 bg-slate-200/50 px-2 py-0.5 rounded-md">高度饱和</span></h3>
               <p className="text-sm text-slate-500 mb-6">流量垄断于平台，目的地沦为被动供应商。</p>
             </SurfaceCard>
 
             <SurfaceCard delay={200} hover={false} className="!border-blue-300 !bg-gradient-to-b from-white to-blue-50/50 shadow-xl transform md:-translate-y-4 ring-1 ring-blue-500/10">
               <div className="absolute top-0 inset-x-0 h-1 bg-blue-500"></div>
               <div className="text-xs font-bold text-blue-500 mb-3 uppercase tracking-widest flex items-center gap-1"><Sparkles size={14}/> Mid-trip (Nianxx)</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">行中市场 <span className="text-sm font-normal text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">亟待重组</span></h3>
+              <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">行中市场 <span className="text-sm font-normal text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">亟待重组</span></h3>
               <p className="text-sm text-slate-600 mb-6 font-medium">游客已在目的地，消费随机发生，缺乏智能入口。</p>
             </SurfaceCard>
 
             <SurfaceCard delay={300} hover={false} className="!bg-white/40 opacity-70">
-              <div className="text-xs font-bold text-slate-400 mb-3 uppercase tracking-widest">Post-trip</div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-2">行后市场 <span className="text-sm font-normal text-slate-500 bg-slate-200/50 px-2 py-0.5 rounded-md">成熟沉淀</span></h3>
+              <div className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-widest">Post-trip</div>
+              <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">行后市场 <span className="text-sm font-normal text-slate-500 bg-slate-200/50 px-2 py-0.5 rounded-md">成熟沉淀</span></h3>
               <p className="text-sm text-slate-500 mb-6">消费已结束，形成评价影响下一次决策。</p>
             </SurfaceCard>
           </div>
@@ -1987,433 +2264,167 @@ export default function App() {
       {/* --- Section 3: 私有核心资产 (Light Nexus) --- */}
       <ConceptLightNexus />
 
-      {/* --- Section 3.5: 信任驱动消费 (Feature Rows) --- */}
-      <section className="py-16 lg:py-20 relative z-10 bg-white">
+      {/* --- Section 3.5: 消费闭环 (Feature Rows) --- */}
+      <section className="py-20 lg:py-24 relative z-10 bg-white">
         <div className="max-w-[1200px] mx-auto px-6">
-          {/* Header */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-center mb-10"
+            className="text-center mb-16"
           >
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-500 font-semibold text-[13px] mb-6 border border-blue-100">
-              <Sparkles size={12} className="mr-1.5" /> 消费闭环
-            </span>
-            <h3 className="text-[44px] md:text-[56px] font-extrabold leading-tight text-slate-900 mb-6 tracking-tight">信任驱动消费，服务连接一切。</h3>
-            <p className="text-[18px] md:text-[20px] text-slate-500 max-w-2xl mx-auto">从需求到交易，AI 智能体全程陪伴，构建完整的旅游服务生态。</p>
-          </motion.div>
-
-          {/* Feature Rows Container */}
-          <div className="relative w-full">
-            {/* Center Timeline Axis */}
-            <div className="absolute left-1/2 top-[5%] bottom-[5%] w-px border-l border-dashed border-slate-200 -translate-x-1/2 hidden lg:block z-0" />
-
-            {/* Row 1: 资讯 */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="relative flex flex-col lg:flex-row items-center justify-between w-full mb-20 group"
-            >
-              {/* Center Node */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
-                <div className="absolute w-12 h-12 rounded-full bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-blue-500 group-hover:border-blue-100">
-                  01
-                </div>
-              </div>
-
-              {/* Image Area */}
-              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pr-8 lg:pl-4">
-                <GraphicOne />
-              </div>
-
-              {/* Text Area */}
-              <div className="w-full lg:w-[45%] lg:pl-8">
-                <div className="flex items-center mb-3">
-                  <span className="text-[12px] font-bold tracking-widest uppercase text-blue-400">
-                    服务构建信任
-                  </span>
-                  <div className="h-px w-8 bg-blue-100 ml-4" />
-                </div>
-                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">资讯获取</h4>
-                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
-                  整合实时运营状态与口碑数据，智能推荐最适合游客的景点与体验，提供无缝预订服务。
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
-                    景点推荐
-                  </div>
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
-                    实时数据
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Row 2: 呼叫响应 */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
-              className="relative flex flex-col lg:flex-row-reverse items-center justify-between w-full mb-20 group"
-            >
-              {/* Center Node */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
-                <div className="absolute w-12 h-12 rounded-full bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-blue-500 group-hover:border-blue-100">
-                  02
-                </div>
-              </div>
-
-              {/* Image Area */}
-              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pl-8">
-                <GraphicTwo />
-              </div>
-
-              {/* Text Area */}
-              <div className="w-full lg:w-[45%] lg:pr-8">
-                <div className="flex items-center mb-3">
-                  <span className="text-[12px] font-bold tracking-widest uppercase text-blue-400">
-                    服务构建信任
-                  </span>
-                  <div className="h-px w-8 bg-blue-100 ml-4" />
-                </div>
-                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">呼叫响应</h4>
-                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
-                  自然语音交互，随时响应延迟退房、活动报名等即时需求，让贴心服务始终零距离。
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
-                    24/7响应
-                  </div>
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
-                    即时需求
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Row 3: 需求感知 */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="relative flex flex-col lg:flex-row items-center justify-between w-full mb-20 group"
-            >
-              {/* Center Node */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
-                <div className="absolute w-12 h-12 rounded-full bg-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-blue-500 group-hover:border-blue-100">
-                  03
-                </div>
-              </div>
-
-              {/* Image Area */}
-              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pr-8 lg:pl-4">
-                <GraphicThree />
-              </div>
-
-              {/* Text Area */}
-              <div className="w-full lg:w-[45%] lg:pl-8">
-                <div className="flex items-center mb-3">
-                  <span className="text-[12px] font-bold tracking-widest uppercase text-blue-400">
-                    服务构建信任
-                  </span>
-                  <div className="h-px w-8 bg-blue-100 ml-4" />
-                </div>
-                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">需求感知</h4>
-                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
-                  持续感知游客偏好，智能收集并分析个性化需求，前置性地提供定制化服务建议。
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
-                    个性化
-                  </div>
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mr-2.5" />
-                    深度分析
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Row 4: 全程伴游 */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              viewport={{ once: true }}
-              className="relative flex flex-col lg:flex-row-reverse items-center justify-between w-full mb-20 group"
-            >
-              {/* Center Node */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
-                <div className="absolute w-12 h-12 rounded-full bg-green-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-green-600 group-hover:border-green-200">
-                  04
-                </div>
-              </div>
-
-              {/* Image Area */}
-              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pl-8">
-                <GraphicFour />
-              </div>
-
-              {/* Text Area */}
-              <div className="w-full lg:w-[45%] lg:pr-8">
-                <div className="flex items-center mb-3">
-                  <span className="text-[12px] font-bold tracking-widest uppercase text-green-500">
-                    信任驱动交易
-                  </span>
-                  <div className="h-px w-8 bg-green-100 ml-4" />
-                </div>
-                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">全程伴游</h4>
-                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
-                  专属AI智能体全程陪伴，从接机入网到离境送机，提供无缝衔接的贴心陪伴式体验。
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
-                    全程陪伴
-                  </div>
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
-                    贴心服务
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Row 5: 商品智荐 */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              viewport={{ once: true }}
-              className="relative flex flex-col lg:flex-row items-center justify-between w-full mb-20 group"
-            >
-              {/* Center Node */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
-                <div className="absolute w-12 h-12 rounded-full bg-green-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-green-600 group-hover:border-green-200">
-                  05
-                </div>
-              </div>
-
-              {/* Image Area */}
-              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pr-8 lg:pl-4">
-                <GraphicFive />
-              </div>
-
-              {/* Text Area */}
-              <div className="w-full lg:w-[45%] lg:pl-8">
-                <div className="flex items-center mb-3">
-                  <span className="text-[12px] font-bold tracking-widest uppercase text-green-500">
-                    信任驱动交易
-                  </span>
-                  <div className="h-px w-8 bg-green-100 ml-4" />
-                </div>
-                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">商品智荐</h4>
-                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
-                  基于游客即时偏好与当下所处场景，智能推荐精选商品，让优质产品主动找到目标客户。
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
-                    精选推荐
-                  </div>
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
-                    智能匹配
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Row 6: 一站式预约 */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              viewport={{ once: true }}
-              className="relative flex flex-col lg:flex-row-reverse items-center justify-between w-full group"
-            >
-              {/* Center Node */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
-                <div className="absolute w-12 h-12 rounded-full bg-green-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative w-9 h-9 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-[14px] font-semibold text-slate-700 z-10 transition-transform group-hover:scale-110 duration-300 group-hover:text-green-600 group-hover:border-green-200">
-                  06
-                </div>
-              </div>
-
-              {/* Image Area */}
-              <div className="w-full lg:w-[45%] mb-6 lg:mb-0 lg:pl-8">
-                <GraphicSix />
-              </div>
-
-              {/* Text Area */}
-              <div className="w-full lg:w-[45%] lg:pr-8">
-                <div className="flex items-center mb-3">
-                  <span className="text-[12px] font-bold tracking-widest uppercase text-green-500">
-                    信任驱动交易
-                  </span>
-                  <div className="h-px w-8 bg-green-100 ml-4" />
-                </div>
-                <h4 className="text-[32px] leading-tight font-bold text-slate-900 mb-5 tracking-tight">一站式预约</h4>
-                <p className="text-slate-500 text-[17px] leading-relaxed mb-8">
-                  打破业务孤岛，整合目的地所有服务资源，一站式完成门票、餐饮、住宿等全部预约需求。
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
-                    一站式
-                  </div>
-                  <div className="flex items-center px-3 py-1.5 bg-slate-50 rounded-md border border-slate-100 text-[14px] font-medium text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2.5" />
-                    全流程
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* --- Section 4: 产品功能 (Z-Pattern Horizontal Gallery) --- */}
-      <section id="产品功能" className="py-20 relative z-10 bg-slate-50">
-        <div className="max-w-[1200px] mx-auto px-6 mb-12">
-          {/* Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 font-semibold text-[13px] mb-6 border border-indigo-100">
-              <Sparkles size={12} className="mr-1.5" /> 产品功能
-            </span>
-            <h2 className="text-[44px] md:text-[56px] font-extrabold leading-tight text-slate-900 mb-4 tracking-tight">
-              一个智能体，两副面孔
+            <h2 className="text-[44px] md:text-[56px] font-extrabold leading-tight text-slate-900 mb-6 tracking-tight">
+              全旅程 AI 伴游体验蓝图
             </h2>
-            <p className="text-[18px] text-slate-500 max-w-2xl mx-auto">
-              面向游客的贴心陪伴，面向内部的智能运营，一个智能体，双重价值创造。
+            <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mx-auto">
+              重塑触点结构，从破冰建联到离店回味，以无缝衔接的智能交互覆盖游客体验全生命周期。
             </p>
           </motion.div>
+
+          <div className="relative w-full">
+            <div className="absolute left-1/2 top-[2%] bottom-[2%] w-px border-l border-dashed border-slate-200 -translate-x-1/2 hidden lg:block z-0"></div>
+
+            <FeatureRow 
+              number="01"
+              eyebrow="触点前置"
+              title="游客到达前"
+              description="专属AI助手主动建立联系，提供行程确认、天气预警与抵达指引。让贴心服务在踏上旅途前便已开启，有效建立初步信任。"
+              graphic={<GraphicArrival />}
+              features={[{ text: "主动建联" }, { text: "行程破冰" }]}
+              reverse={false}
+            />
+
+            <FeatureRow 
+              number="02"
+              eyebrow="即时响应"
+              title="游客在目的地"
+              description="无缝对接客房服务、设施预约等刚性需求。通过语音或文字呼叫，系统自动生成智能工单并分发，服务履约进度全透明。"
+              graphic={<GraphicDestination />}
+              features={[{ text: "一键呼叫" }, { text: "智能派单" }]}
+              reverse={true}
+            />
+
+            <FeatureRow 
+              number="03"
+              eyebrow="场景驱动"
+              title="游客探索中"
+              description="基于游客即时位置(LBS)与行为偏好，在游玩过程中自然穿插特色餐饮、周边活动等伴游推荐，用服务带出消费场景。"
+              graphic={<GraphicExploration />}
+              features={[{ text: "LBS感知" }, { text: "无感转化" }]}
+              reverse={false}
+            />
+
+            <FeatureRow 
+              number="04"
+              eyebrow="情感升华"
+              title="游客将离开"
+              description="整合旅途足迹与互动高光时刻，结合 AIGC 自动生成专属的趣味回忆卡片或数字明信片，沉淀极具情绪价值的品牌印记。"
+              graphic={<GraphicDeparture />}
+              features={[{ text: "AIGC生成" }, { text: "情绪资产" }]}
+              reverse={true}
+            />
+          </div>
         </div>
-
-        {/* Z-Pattern Horizontal Gallery */}
-        <div className="w-full overflow-hidden">
-          
-          {/* Chapter 1: 游客视角 (LTR) */}
-          <div className="relative w-full flex items-center py-12">
-            <div className="absolute pointer-events-none whitespace-nowrap text-[15vw] font-black text-slate-900/5 leading-none select-none top-[20%] font-sans tracking-tighter mix-blend-multiply opacity-50">
-              TOURIST PERSPECTIVE
-            </div>
-            
-            <div 
-              ref={scrollRef1}
-              dir="ltr" 
-              className="relative z-10 w-full flex items-center gap-8 overflow-x-auto hide-scrollbar px-[8vw] py-8"
-            >
-              
-              {/* Intro Card */}
-              <div className="shrink-0 w-[80vw] md:w-[30vw] flex flex-col justify-center">
-                <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-600 font-bold text-[11px] mb-4 uppercase tracking-widest w-fit">
-                  Chapter 01
-                </span>
-                <h3 className="text-[38px] md:text-[52px] font-bold text-slate-900 leading-[1.1] tracking-tight">
-                  游客视角<br/>沉浸探索
-                </h3>
-                <p className="text-slate-500 mt-5 text-[15px] md:text-[17px] leading-relaxed max-w-sm">
-                  无微不至的陪伴体验，打破数字与现实的边界，让每一次旅程都充满温度。
-                </p>
-                <div className="mt-8 flex items-center text-slate-400 text-sm font-semibold tracking-wider animate-pulse">
-                   滑动探索 <ArrowRight className="w-4 h-4 ml-2" />
-                </div>
-              </div>
-
-              {/* Tourist Cards */}
-              {TOURIST_CARDS.map(card => (
-                <GalleryCard key={card.id} card={card} onSelect={setSelectedCard} />
-              ))}
-
-              <div className="shrink-0 w-[5vw]"></div>
-            </div>
-          </div>
-
-
-          {/* Z-Axis Transition */}
-          <div className="w-full flex justify-center py-8">
-             <div className="w-px h-20 bg-gradient-to-b from-blue-200 to-transparent"></div>
-          </div>
-
-
-          {/* Chapter 2: 内部视角 (RTL) */}
-          <div className="relative w-full flex items-center pb-16">
-            <div className="absolute pointer-events-none whitespace-nowrap text-[15vw] font-black text-slate-900/5 leading-none select-none top-[20%] font-sans tracking-tighter mix-blend-multiply opacity-50 right-0 transform translate-x-[10%]">
-              INTERNAL PERSPECTIVE
-            </div>
-            
-            <div 
-              ref={scrollRef2}
-              dir="rtl" 
-              className="relative z-10 w-full flex items-center gap-8 overflow-x-auto hide-scrollbar px-[8vw] py-8"
-            >
-              
-              {/* Intro Card */}
-              <div className="shrink-0 w-[80vw] md:w-[30vw] flex flex-col justify-center items-end text-right" dir="ltr">
-                <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-600 font-bold text-[11px] mb-4 uppercase tracking-widest w-fit">
-                  Chapter 02
-                </span>
-                <h3 className="text-[38px] md:text-[52px] font-bold text-slate-900 leading-[1.1] tracking-tight">
-                  内部视角<br/>效率革命
-                </h3>
-                <p className="text-slate-500 mt-5 text-[15px] md:text-[17px] leading-relaxed max-w-sm ml-auto">
-                  从繁杂的流程中解脱，让系统自动化接管日常营运与决策辅助。
-                </p>
-                <div className="mt-8 flex items-center text-slate-400 text-sm font-semibold tracking-wider animate-pulse flex-row-reverse">
-                   滑动探索 <ArrowRight className="w-4 h-4 mr-2 transform rotate-180" />
-                </div>
-              </div>
-
-              {/* Internal Cards */}
-              {INTERNAL_CARDS.map(card => (
-                <GalleryCard key={card.id} card={card} onSelect={setSelectedCard} />
-              ))}
-
-              <div className="shrink-0 w-[5vw]"></div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Global Styles for Scroll */}
-        <style>{`
-          .hide-scrollbar::-webkit-scrollbar { display: none; }
-          .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        `}</style>
-
-        {/* Detail Modal */}
-        <DetailModal card={selectedCard} onClose={() => setSelectedCard(null)} />
       </section>
 
-      {/* --- Section 5: 落地案例 --- */}
+      {/* --- 产品功能标题 --- */}
+      <section className="relative py-20 md:py-32 bg-[#fcfdfe]">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-500 text-xs font-medium uppercase tracking-wider mb-8">
+            产品功能
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-950 tracking-tight mb-6">
+            一个智能体，两副面孔
+          </h2>
+          <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mx-auto">
+            面向游客的贴心陪伴，面向内部的智能运营
+          </p>
+          <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mx-auto">
+            一个智能体，双重价值创造
+          </p>
+        </div>
+      </section>
+
+      {/* --- Section 4: 产品功能 (Sticky Section) --- */}
+      <section id="产品功能" className="relative w-full md:h-screen md:flex md:overflow-hidden">
+        {/* 左侧：游客视角 - 固定 */}
+        <div className="w-full md:w-[40%] md:h-full md:flex md:items-center px-6 md:px-[10vw] py-20 bg-[#fcfdfe]">
+          <div>
+            <div className="inline-block px-3 py-1 bg-slate-950 text-white font-black text-[9px] uppercase tracking-[0.3em] rounded mb-8">
+              Vol.01
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-950 leading-[0.95] tracking-tighter mb-10">
+              游客视角<br/>沉浸式陪伴
+            </h2>
+            <div className="h-px w-20 bg-blue-600 mb-10"></div>
+            <p className="text-slate-500 text-lg md:text-xl leading-relaxed max-w-sm font-normal">
+              我们追求极致的交互温度，让每一个触点都化为旅途中的美好记忆。不仅仅是功能，更是情感的延伸。
+            </p>
+          </div>
+        </div>
+        {/* 右侧：长列表内容 - 独立滚动 */}
+        <div 
+          className="w-full md:w-[60%] md:h-full md:overflow-y-auto md:snap-y md:snap-mandatory px-6 md:px-[10vw] py-20 bg-[#fcfdfe]"
+          onScroll={(e) => {
+            const { scrollTop, scrollHeight, clientHeight } = e.target;
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              document.getElementById('内部视角')?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        >
+          {TOURIST_CARDS.map((card) => (
+            <GalleryCard key={card.id} card={card} onSelect={setSelectedCard} />
+          ))}
+        </div>
+      </section>
+
+      {/* --- Section 5: 内部视角 --- */}
+      <section id="内部视角" className="relative w-full md:h-screen md:flex md:overflow-hidden">
+        {/* 左侧：内部视角 - 固定 */}
+        <div className="w-full md:w-[40%] md:h-full md:flex md:items-center px-6 md:px-[10vw] py-20 bg-[#fcfdfe]">
+          <div>
+            <div className="inline-block px-3 py-1 bg-slate-950 text-white font-black text-[9px] uppercase tracking-[0.3em] rounded mb-8">
+              Vol.02
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-950 leading-[0.95] tracking-tighter mb-10">
+              内部视角<br/>效率即美学
+            </h2>
+            <div className="h-px w-20 bg-blue-600 mb-10"></div>
+            <p className="text-slate-500 text-lg md:text-xl leading-relaxed max-w-sm font-normal">
+              将复杂的业务逻辑抽象为极简的自动化流。效率的提升不仅是数字，更是营运艺术的回归。
+            </p>
+          </div>
+        </div>
+        {/* 右侧：长列表内容 - 独立滚动 */}
+        <div 
+          className="w-full md:w-[60%] md:h-full md:overflow-y-auto md:snap-y md:snap-mandatory px-6 md:px-[10vw] py-20 bg-[#fcfdfe]"
+          onScroll={(e) => {
+            const { scrollTop, scrollHeight, clientHeight } = e.target;
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              document.getElementById('落地案例')?.scrollIntoView({ behavior: 'smooth' });
+            }
+            if (scrollTop <= 0) {
+              document.getElementById('产品功能')?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        >
+          {INTERNAL_CARDS.map((card) => (
+            <GalleryCard key={card.id} card={card} onSelect={setSelectedCard} />
+          ))}
+        </div>
+      </section>
+
+      {/* Detail Modal */}
+      <DetailModal card={selectedCard} onClose={() => setSelectedCard(null)} />
+      {showContactModal && <ContactModal onClose={() => setShowContactModal(false)} />}
+
+      {/* --- Section 6: 落地案例 --- */}
       <section id="落地案例" className="py-32 relative z-10 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-6">落地案例验证</h2>
-            <p className="text-lg text-slate-500 font-light max-w-2xl mx-auto leading-relaxed">首批项目已在贵州落地，覆盖景区、温泉、酒店等，进入真实运营阶段。</p>
+            <p className="text-lg text-slate-500 font-normal max-w-2xl mx-auto leading-relaxed">首批项目已在贵州落地，覆盖景区、温泉、酒店等，进入真实运营阶段。</p>
           </div>
 
           <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
@@ -2434,7 +2445,7 @@ export default function App() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
-                  <span className="px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                  <span className="px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-slate-800 uppercase tracking-wider">
                     {CASES[selectedCase].type}
                   </span>
                   <h3 className="text-2xl font-bold text-white mt-3">{CASES[selectedCase].name}</h3>
@@ -2474,32 +2485,33 @@ export default function App() {
                     <p className="text-sm text-slate-500">{item.type} · {item.ai}</p>
                   </div>
                   {selectedCase === i ? (
-                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-amber-100 shrink-0">
-                      <img 
-                        src={item.image} 
+                    <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0">
+                      <img
+                        src={item.cardImage}
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
                   ) : (
-                    <ArrowRight size={20} className="text-slate-400 group-hover:text-slate-600 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight size={20} className="text-slate-500 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
                   )}
                 </motion.div>
               ))}
 
-              {/* 查看全部按钮 */}
+              {/* 联系我们按钮 */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ delay: CASES.length * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
+                onClick={() => setShowContactModal(true)}
                 className="flex items-center gap-4 p-4 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-colors cursor-pointer mt-auto"
               >
                 <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center shrink-0">
                   <ArrowRight size={18} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-slate-900">查看全部</h3>
+                  <h3 className="text-base font-semibold text-slate-900">联系我们</h3>
                   <p className="text-sm text-slate-500">探索更多落地案例</p>
                 </div>
               </motion.div>
@@ -2516,21 +2528,21 @@ export default function App() {
            <div className="grid lg:grid-cols-2 gap-16 relative z-10">
              <div>
                <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-6">让接入更轻，<br/>让增量更快发生。</h2>
-               <p className="text-slate-400 font-light mb-12 max-w-md">无论是单个景区酒店，还是全域文旅规划，我们都能提供在不改变现有业务基础上的开箱即用方案。</p>
+               <p className="text-slate-500 font-normal mb-12 max-w-md">无论是单个景区酒店，还是全域文旅规划，我们都能提供在不改变现有业务基础上的开箱即用方案。</p>
                
                <div className="flex flex-col sm:flex-row gap-4">
-                 <ShinyButton>获取合作方案</ShinyButton>
+                 <ShinyButton onClick={() => setShowContactModal(true)}>获取合作方案</ShinyButton>
                </div>
              </div>
 
              <div className="flex flex-col justify-center gap-10 lg:pl-16 lg:border-l border-white/10">
                <div>
                  <div className="flex items-center gap-3 mb-3 text-white text-xl"><Building size={20}/> <span className="font-bold">面向景区、酒店业主</span></div>
-                 <p className="text-sm text-slate-400 font-light leading-relaxed mb-3">提供私有智能体建设服务，快速拥有游客端 AI 入口与内部智能运营系统。</p>
+                 <p className="text-sm text-slate-500 font-normal leading-relaxed mb-3">提供私有智能体建设服务，快速拥有游客端 AI 入口与内部智能运营系统。</p>
                </div>
                <div>
                  <div className="flex items-center gap-3 mb-3 text-white text-xl"><Globe size={20}/> <span className="font-bold">面向政府与文旅机构</span></div>
-                 <p className="text-sm text-slate-400 font-light leading-relaxed mb-3">以游客数据为基础构建数字伴游基础设施，连接交通枢纽与公共场所。</p>
+                 <p className="text-sm text-slate-500 font-normal leading-relaxed mb-3">以游客数据为基础构建数字伴游基础设施，连接交通枢纽与公共场所。</p>
                </div>
              </div>
            </div>
